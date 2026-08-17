@@ -7,6 +7,7 @@ import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/br
 function LoginForm() {
   const params = useSearchParams();
   const next = params.get("next") || "/";
+  const callbackError = params.get("error");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [passkeySupported, setPasskeySupported] = useState(false);
@@ -85,6 +86,10 @@ function LoginForm() {
           {status === "sending" ? "보내는 중" : "로그인 링크 받기"}
         </button>
         {status === "error" && <p className="muted">링크를 보내지 못했어요. 잠시 후 다시 시도해주세요.</p>}
+        {callbackError === "exchange_failed" && (
+          <p className="muted">로그인 링크가 만료됐거나, 링크를 요청한 브라우저와 다른 브라우저에서 열었어요. 같은 브라우저에서 다시 받아주세요.</p>
+        )}
+        {callbackError === "missing_code" && <p className="muted">링크가 올바르지 않아요. 다시 받아주세요.</p>}
       </form>
       {passkeySupported && (
         <>

@@ -7,9 +7,15 @@ export async function GET(request: Request) {
   const next = url.searchParams.get("next");
   const redirectTo = next && next.startsWith("/") ? next : "/";
 
-  if (code) {
-    const supabase = await createSupabaseServerClient();
-    await supabase.auth.exchangeCodeForSession(code);
+  if (!code) {
+    return NextResponse.redirect(new URL("/login?error=missing_code", url.origin));
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+  if (error) {
+    return NextResponse.redirect(new URL("/login?error=exchange_failed", url.origin));
   }
 
   return NextResponse.redirect(new URL(redirectTo, url.origin));
