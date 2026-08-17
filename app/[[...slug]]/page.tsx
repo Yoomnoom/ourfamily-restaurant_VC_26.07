@@ -908,17 +908,22 @@ export default function App() {
   }, []);
 
   const loadSession = useCallback(async () => {
-    try {
-      const body = await api("/api/me");
-      setProfile(body.profile);
-      setHouseholds(body.households);
-      const saved = localStorage.getItem("current-household-id");
-      const validSaved = body.households.find((house: Household) => house.id === saved);
-      if (validSaved) setCurrentHouseholdIdState(validSaved.id);
-      else if (body.households[0]) setCurrentHouseholdId(body.households[0].id);
-    } catch {
-      setLoadError(true);
+    const response = await fetch("/api/me");
+    if (response.status === 401) {
+      location.href = `/login?next=${encodeURIComponent(location.pathname)}`;
+      return;
     }
+    if (!response.ok) {
+      setLoadError(true);
+      return;
+    }
+    const body = await response.json();
+    setProfile(body.profile);
+    setHouseholds(body.households);
+    const saved = localStorage.getItem("current-household-id");
+    const validSaved = body.households.find((house: Household) => house.id === saved);
+    if (validSaved) setCurrentHouseholdIdState(validSaved.id);
+    else if (body.households[0]) setCurrentHouseholdId(body.households[0].id);
   }, [setCurrentHouseholdId]);
 
   useEffect(() => {

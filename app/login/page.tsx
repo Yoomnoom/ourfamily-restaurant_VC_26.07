@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, Suspense, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 function LoginForm() {
@@ -8,6 +8,12 @@ function LoginForm() {
   const next = params.get("next") || "/";
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  useEffect(() => {
+    fetch("/api/me").then((response) => {
+      if (response.ok) location.href = next;
+    });
+  }, [next]);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
