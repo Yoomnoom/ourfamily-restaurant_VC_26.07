@@ -10,8 +10,8 @@ export async function GET(request: Request) {
   if (!householdId) return NextResponse.json({ error: "household_id_required" }, { status: 400 });
 
   const { data, error } = await supabase
-    .from("meals")
-    .select("*, meal_participants(profile_id), meal_responses(id, profile_id, guest_name, is_guest, status, arrival_time)")
+    .from("meals_vc2608")
+    .select("*, meal_participants:meal_participants_vc2608(profile_id), meal_responses:meal_responses_vc2608(id, profile_id, guest_name, is_guest, status, arrival_time)")
     .eq("household_id", householdId)
     .order("date", { ascending: true })
     .order("time", { ascending: true });
@@ -37,14 +37,14 @@ export async function POST(request: Request) {
   }
 
   const { data: members, error: membersError } = await supabase
-    .from("household_members")
+    .from("household_members_vc2608")
     .select("profile_id")
     .eq("household_id", householdId);
 
   if (membersError) return NextResponse.json({ error: "load_failed" }, { status: 500 });
 
   const { data: meal, error: mealError } = await supabase
-    .from("meals")
+    .from("meals_vc2608")
     .insert({ household_id: householdId, creator_id: user.id, date, time, kind, menu, note })
     .select()
     .single();
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
   if (mealError) return NextResponse.json({ error: "create_failed" }, { status: 400 });
 
   if (members && members.length > 0) {
-    await supabase.from("meal_participants").insert(members.map((member) => ({ meal_id: meal.id, profile_id: member.profile_id })));
+    await supabase.from("meal_participants_vc2608").insert(members.map((member) => ({ meal_id: meal.id, profile_id: member.profile_id })));
   }
 
   await notifyHousehold(householdId, `${menu} 식사가 열렸어요`, `${date} · ${time}`, { mealId: meal.id, excludeProfileId: user.id });

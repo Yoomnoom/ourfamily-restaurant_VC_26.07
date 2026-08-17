@@ -9,8 +9,8 @@ export async function GET(request: Request) {
   if (!householdId) return NextResponse.json({ error: "household_id_required" }, { status: 400 });
 
   const { data, error } = await supabase
-    .from("menu_requests")
-    .select("id, menu, created_at, profiles(id, name)")
+    .from("menu_requests_vc2608")
+    .select("id, menu, created_at, profiles:profiles_vc2608(id, name)")
     .eq("household_id", householdId)
     .order("created_at", { ascending: false });
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   if (!householdId || !menu) return NextResponse.json({ error: "missing_fields" }, { status: 400 });
 
   const { data, error } = await supabase
-    .from("menu_requests")
+    .from("menu_requests_vc2608")
     .insert({ household_id: householdId, profile_id: user.id, menu })
     .select()
     .single();
@@ -44,7 +44,7 @@ export async function DELETE(request: Request) {
   const id = new URL(request.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id_required" }, { status: 400 });
 
-  const { error } = await supabase.from("menu_requests").delete().eq("id", id);
+  const { error } = await supabase.from("menu_requests_vc2608").delete().eq("id", id);
   if (error) return NextResponse.json({ error: "delete_failed" }, { status: 400 });
   return NextResponse.json({ success: true });
 }

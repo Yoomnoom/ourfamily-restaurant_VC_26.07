@@ -9,7 +9,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const { id } = await params;
 
   const { data, error } = await supabase
-    .from("meal_share_links")
+    .from("meal_share_links_vc2608")
     .select("id, created_at, expires_at")
     .eq("meal_id", id)
     .is("revoked_at", null)
@@ -26,11 +26,11 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   if (unauthorized) return unauthorized;
   const { id } = await params;
 
-  await supabase.from("meal_share_links").update({ revoked_at: new Date().toISOString() }).eq("meal_id", id).is("revoked_at", null);
+  await supabase.from("meal_share_links_vc2608").update({ revoked_at: new Date().toISOString() }).eq("meal_id", id).is("revoked_at", null);
 
   const token = generateToken();
   const { error } = await supabase
-    .from("meal_share_links")
+    .from("meal_share_links_vc2608")
     .insert({ meal_id: id, token_hash: hashToken(token), created_by: user.id });
 
   if (error) return NextResponse.json({ error: "create_failed" }, { status: 400 });
@@ -43,7 +43,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   const { id } = await params;
 
   const { error } = await supabase
-    .from("meal_share_links")
+    .from("meal_share_links_vc2608")
     .update({ revoked_at: new Date().toISOString() })
     .eq("meal_id", id)
     .is("revoked_at", null);

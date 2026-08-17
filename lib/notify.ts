@@ -9,11 +9,11 @@ export async function notifyHousehold(
   options: { mealId?: string; excludeProfileId?: string } = {}
 ) {
   const admin = createSupabaseAdminClient();
-  const { data: members } = await admin.from("household_members").select("profile_id").eq("household_id", householdId);
+  const { data: members } = await admin.from("household_members_vc2608").select("profile_id").eq("household_id", householdId);
   const recipients = (members ?? []).filter((member) => member.profile_id !== options.excludeProfileId);
   if (recipients.length === 0) return;
 
-  await admin.from("notifications").insert(
+  await admin.from("notifications_vc2608").insert(
     recipients.map((member) => ({
       household_id: householdId,
       profile_id: member.profile_id,

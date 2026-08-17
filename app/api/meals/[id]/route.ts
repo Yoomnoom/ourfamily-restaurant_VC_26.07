@@ -26,7 +26,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "nothing_to_update" }, { status: 400 });
   }
 
-  const { data, error } = await supabase.from("meals").update(update).eq("id", id).select().single();
+  const { data, error } = await supabase.from("meals_vc2608").update(update).eq("id", id).select().single();
   if (error) return NextResponse.json({ error: "update_failed" }, { status: 400 });
   return NextResponse.json({ meal: data });
 }

@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const code = typeof body?.code === "string" ? body.code.trim() : "";
   if (!code) return NextResponse.json({ error: "code_required" }, { status: 400 });
 
-  const { data, error } = await supabase.rpc("redeem_household_invite", { invite_code_hash: hashToken(code) });
+  const { data, error } = await supabase.rpc("redeem_household_invite_vc2608", { invite_code_hash: hashToken(code) });
   if (error) return NextResponse.json({ error: "invalid_or_expired_invite" }, { status: 400 });
 
   return NextResponse.json({ household: data });

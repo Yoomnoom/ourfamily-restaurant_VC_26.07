@@ -10,7 +10,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const newOwnerProfileId = typeof body?.profileId === "string" ? body.profileId : "";
   if (!newOwnerProfileId) return NextResponse.json({ error: "profile_id_required" }, { status: 400 });
 
-  const { data, error } = await supabase.rpc("transfer_household_owner", {
+  const { data, error } = await supabase.rpc("transfer_household_owner_vc2608", {
     target_household: id,
     new_owner_profile: newOwnerProfileId
   });

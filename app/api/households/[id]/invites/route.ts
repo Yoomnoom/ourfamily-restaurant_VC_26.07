@@ -8,7 +8,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   const { id } = await params;
 
   const code = generateToken();
-  const { error } = await supabase.rpc("create_household_invite", {
+  const { error } = await supabase.rpc("create_household_invite_vc2608", {
     target_household: id,
     code_hash: hashToken(code)
   });

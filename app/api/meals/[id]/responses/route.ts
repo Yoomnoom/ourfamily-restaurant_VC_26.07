@@ -7,7 +7,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   if (unauthorized) return unauthorized;
   const { id } = await params;
 
-  const { data, error } = await supabase.from("meal_responses").select("*").eq("meal_id", id);
+  const { data, error } = await supabase.from("meal_responses_vc2608").select("*").eq("meal_id", id);
   if (error) return NextResponse.json({ error: "load_failed" }, { status: 500 });
   return NextResponse.json({ responses: data });
 }
@@ -26,7 +26,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 
   const { data, error } = await supabase
-    .from("meal_responses")
+    .from("meal_responses_vc2608")
     .upsert(
       { meal_id: id, profile_id: user.id, is_guest: false, status, arrival_time: arrivalTime },
       { onConflict: "meal_id,profile_id" }
@@ -37,8 +37,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (error) return NextResponse.json({ error: "respond_failed" }, { status: 400 });
 
   const [{ data: meal }, { data: profile }] = await Promise.all([
-    supabase.from("meals").select("household_id, menu").eq("id", id).single(),
-    supabase.from("profiles").select("name").eq("id", user.id).single()
+    supabase.from("meals_vc2608").select("household_id, menu").eq("id", id).single(),
+    supabase.from("profiles_vc2608").select("name").eq("id", user.id).single()
   ]);
 
   if (meal) {

@@ -11,7 +11,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ toke
   }
 
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.rpc("get_meal_by_share_token", { share_token_hash: hashToken(token) });
+  const { data, error } = await supabase.rpc("get_meal_by_share_token_vc2608", { share_token_hash: hashToken(token) });
 
   if (error || !data || data.length === 0) {
     return NextResponse.json({ error: "invalid_or_expired_link" }, { status: 404 });

@@ -11,7 +11,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ toke
   if (!guestToken) return NextResponse.json({ response: null });
 
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.rpc("get_guest_response", {
+  const { data } = await supabase.rpc("get_guest_response_vc2608", {
     share_token_hash: hashToken(token),
     guest_token_value: guestToken
   });
@@ -37,7 +37,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
   }
 
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.rpc("submit_guest_meal_response", {
+  const { data, error } = await supabase.rpc("submit_guest_meal_response_vc2608", {
     share_token_hash: hashToken(token),
     guest_token_value: guestToken,
     guest_display_name: name,
@@ -48,7 +48,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
   if (error) return NextResponse.json({ error: "invalid_or_expired_link" }, { status: 400 });
 
   const admin = createSupabaseAdminClient();
-  const { data: meal } = await admin.from("meals").select("household_id, menu").eq("id", data.meal_id).single();
+  const { data: meal } = await admin.from("meals_vc2608").select("household_id, menu").eq("id", data.meal_id).single();
   if (meal) {
     const statusText = status === "attending" ? "먹어요" : "안 먹어요";
     await notifyHousehold(meal.household_id, `${name} 님이 응답했어요`, `${meal.menu} · ${statusText}`, { mealId: data.meal_id });
