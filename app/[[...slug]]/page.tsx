@@ -888,6 +888,29 @@ function Respond({ token }: { token: string }) {
   );
 }
 
+function Landing() {
+  return (
+    <main className="guest-page warm-table">
+      <div className="guest-brand wt-serif">우리집식당</div>
+      <section className="guest-intro">
+        <h1 className="wt-serif">묻지 않아도 아는 집</h1>
+        <p>가족 식사에서 반복되는 질문과 인원 조율을 줄여주는 서비스예요.</p>
+      </section>
+      <section className="card response-form">
+        <p>
+          <b>식사 만들기</b> → 링크 공유 → 가족이 <b>먹어요/안 먹어요</b> 응답 → 인원 확정 → 기록으로 다시 만들기.
+          <br />
+          <br />
+          가족이 아니어도 공유받은 링크가 있다면 <b>회원가입 없이</b> 그 자리에서 바로 응답할 수 있어요.
+        </p>
+        <button className="submit" onClick={() => (location.href = "/login")}>
+          로그인하고 시작하기
+        </button>
+      </section>
+    </main>
+  );
+}
+
 export default function App() {
   const [path, setPath] = useState("/");
   const [overlay, setOverlay] = useState<Overlay>(null);
@@ -897,6 +920,7 @@ export default function App() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loadError, setLoadError] = useState(false);
+  const [showLanding, setShowLanding] = useState(false);
 
   useEffect(() => {
     const navigate = () => {
@@ -917,6 +941,10 @@ export default function App() {
     try {
     const response = await fetch("/api/me");
     if (response.status === 401) {
+      if (location.pathname === "/") {
+        setShowLanding(true);
+        return;
+      }
       location.href = `/login?next=${encodeURIComponent(location.pathname)}`;
       return;
     }
@@ -988,6 +1016,8 @@ export default function App() {
   }, []);
 
   if (path.startsWith("/respond/")) return <Respond token={path.split("/")[2]} />;
+
+  if (showLanding) return <Landing />;
 
   if (loadError) {
     return (
