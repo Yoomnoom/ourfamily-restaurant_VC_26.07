@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { startRegistration } from "@simplewebauthn/browser";
 import { mealSummary } from "../../lib/data.mjs";
 
 type Profile = { id: string; name: string; email?: string };
@@ -311,7 +312,7 @@ function OverlayPanel({
         ["가족과 가구", "가족 구성원"],
         ["반복 설정", "요일별 기본 응답", "반복 식사 관리", "자주 가는 곳", "알림 설정"],
         ["살림과 제안", "우리집 냉장고", "밀키트 둘러보기"],
-        ["서비스", "계정 설정", "도움말", "개인정보 및 데이터"]
+        ["서비스", "지문 로그인 등록", "계정 설정", "도움말", "개인정보 및 데이터"]
       ];
 
   const markAllRead = async () => {
@@ -353,6 +354,11 @@ function OverlayPanel({
               {items.map((item) =>
                 item === "가족 구성원" ? (
                   <button key={item} onClick={() => { close(); setTimeout(() => window.dispatchEvent(new CustomEvent("open-members")), 0); }}>
+                    {item}
+                    <span>›</span>
+                  </button>
+                ) : item === "지문 로그인 등록" ? (
+                  <button key={item} onClick={() => { close(); setTimeout(() => window.dispatchEvent(new CustomEvent("register-passkey")), 0); }}>
                     {item}
                     <span>›</span>
                   </button>
@@ -413,10 +419,10 @@ function Onboarding({ onReady }: { onReady: () => void }) {
   };
 
   return (
-    <main className="guest-page">
-      <div className="guest-brand">♜ 우리집식당</div>
+    <main className="guest-page warm-table">
+      <div className="guest-brand wt-serif">우리집식당</div>
       <section className="guest-intro">
-        <h1>우리집을 시작해요</h1>
+        <h1 className="wt-serif">우리집을 시작해요</h1>
         <p>새 가구를 만들거나, 가족에게 받은 초대 코드로 참여해요.</p>
       </section>
       <form className="card response-form" onSubmit={createHousehold}>
@@ -953,6 +959,28 @@ export default function App() {
     const openMembers = () => setOverlay("members");
     window.addEventListener("open-members", openMembers);
     return () => window.removeEventListener("open-members", openMembers);
+  }, []);
+
+  useEffect(() => {
+    const registerPasskey = async () => {
+      try {
+        const optionsResponse = await fetch("/api/webauthn/register/options", { method: "POST" });
+        if (!optionsResponse.ok) throw new Error("options_failed");
+        const options = await optionsResponse.json();
+        const attestation = await startRegistration({ optionsJSON: options });
+        const verifyResponse = await fetch("/api/webauthn/register/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(attestation)
+        });
+        if (!verifyResponse.ok) throw new Error("verify_failed");
+        alert("이 기기에 지문 로그인을 등록했어요.");
+      } catch {
+        alert("지문 로그인 등록에 실패했어요. 기기가 지문/패스키를 지원하는지 확인해주세요.");
+      }
+    };
+    window.addEventListener("register-passkey", registerPasskey);
+    return () => window.removeEventListener("register-passkey", registerPasskey);
   }, []);
 
   if (path.startsWith("/respond/")) return <Respond token={path.split("/")[2]} />;
