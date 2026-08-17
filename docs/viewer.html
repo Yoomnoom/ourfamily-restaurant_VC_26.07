@@ -10,6 +10,9 @@
 
   .sidebar { width: 240px; flex-shrink: 0; background: #fff; border-right: 1px solid #e4e2e2; padding: 16px 12px; overflow-y: auto; }
   .sidebar h1 { font-size: 15px; margin: 4px 4px 12px; }
+  .mode-tabs { display: flex; gap: 4px; background: #f0eded; border-radius: 999px; padding: 3px; margin-bottom: 12px; }
+  .mode-tab { flex: 1; padding: 7px 0; border-radius: 999px; border: none; background: transparent; cursor: pointer; font-size: 12px; color: #45474a; }
+  .mode-tab.active { background: #1b1c1c; color: #fff; }
   .base-url { width: 100%; font-size: 12px; padding: 8px; border-radius: 8px; border: 1px solid #c6c6ca; margin-bottom: 14px; }
   .step-btn { text-align: left; width: 100%; padding: 10px 12px; border-radius: 10px; border: none; background: transparent; cursor: pointer; font-size: 14px; color: #1b1c1c; margin-bottom: 4px; display: block; }
   .step-btn:hover { background: #f0eded; }
@@ -33,7 +36,11 @@
 <body>
 <aside class="sidebar">
   <h1>우리집식당 화면</h1>
-  <input id="baseUrl" class="base-url" value="https://ourfamily-restaurant-vc-26-07.vercel.app" title="localhost:3000으로 바꾸면 로컬 dev 서버를 봅니다" />
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="tabStatic">정적 목업</button>
+    <button class="mode-tab" id="tabLive">실제 배포</button>
+  </div>
+  <input id="baseUrl" class="base-url" value="https://ourfamily-restaurant-vc-26-07.vercel.app" style="display:none" title="localhost:3000으로 바꾸면 로컬 dev 서버를 봅니다" />
   <div id="steps"></div>
 </aside>
 <main class="main">
@@ -51,7 +58,26 @@
   </div>
 </main>
 <script>
-  var ROUTES = [
+  // docs/screen-specs.md의 폴더명과 정확히 일치해야 한다.
+  var STATIC_SCREENS = [
+    ["design/01. 로그인/code.html", "1. 로그인"],
+    ["design/02. 온보딩/code.html", "2. 온보딩"],
+    ["design/03. 홈-오늘식사/code.html", "3. 홈 (오늘 식사 있음)"],
+    ["design/04. 홈-빈상태/code.html", "4. 홈 (빈 상태)"],
+    ["design/05. 내식탁/code.html", "5. 내 식탁"],
+    ["design/06. 달력/code.html", "6. 달력"],
+    ["design/07. 기록/code.html", "7. 기록"],
+    ["design/08. 식사만들기/code.html", "8. 식사 만들기"],
+    ["design/09. 식사만들기-완료/code.html", "9. 식사 만들기 완료"],
+    ["design/10. 게스트응답/code.html", "10. 게스트 응답"],
+    ["design/11. 게스트응답-완료/code.html", "11. 게스트 응답 완료"],
+    ["design/12. 게스트응답-오류/code.html", "12. 게스트 응답 오류"],
+    ["design/13. 알림패널/code.html", "13. 알림 패널"],
+    ["design/14. 전체메뉴/code.html", "14. 전체 메뉴"],
+    ["design/15. 가구선택/code.html", "15. 가구 선택"],
+    ["design/16. 가족구성원/code.html", "16. 가족 구성원"]
+  ];
+  var LIVE_ROUTES = [
     ["/login", "로그인 (매직링크 + 패스키)"],
     ["/", "홈 (로그인 필요)"],
     ["/tables", "내 식탁"],
@@ -65,17 +91,33 @@
     ["tablet", "태블릿", 768, 1024],
     ["desktop", "데스크톱", 1280, 800]
   ];
-  var currentPath = ROUTES[0][0];
+  var mode = "static";
   var currentDevice = DEVICES[0];
+  var currentStatic = STATIC_SCREENS[0][0];
+  var currentLive = LIVE_ROUTES[0][0];
+
+  function setMode(next) {
+    mode = next;
+    document.getElementById("tabStatic").classList.toggle("active", mode === "static");
+    document.getElementById("tabLive").classList.toggle("active", mode === "live");
+    document.getElementById("baseUrl").style.display = mode === "live" ? "block" : "none";
+    render();
+    load();
+  }
 
   function render() {
+    var list = mode === "static" ? STATIC_SCREENS : LIVE_ROUTES;
+    var current = mode === "static" ? currentStatic : currentLive;
     var stepsEl = document.getElementById("steps");
     stepsEl.innerHTML = "";
-    ROUTES.forEach(function (r) {
+    list.forEach(function (r) {
       var btn = document.createElement("button");
-      btn.className = "step-btn" + (r[0] === currentPath ? " active" : "");
+      btn.className = "step-btn" + (r[0] === current ? " active" : "");
       btn.innerHTML = r[1] + '<span class="path">' + r[0] + "</span>";
-      btn.onclick = function () { currentPath = r[0]; load(); render(); };
+      btn.onclick = function () {
+        if (mode === "static") currentStatic = r[0]; else currentLive = r[0];
+        load(); render();
+      };
       stepsEl.appendChild(btn);
     });
 
@@ -89,7 +131,7 @@
       deviceGroup.appendChild(btn);
     });
 
-    document.getElementById("titleLabel").textContent = currentPath + " · " + currentDevice[1] + " (" + currentDevice[2] + "×" + currentDevice[3] + ")";
+    document.getElementById("titleLabel").textContent = current + " · " + currentDevice[1] + " (" + currentDevice[2] + "×" + currentDevice[3] + ")";
   }
 
   function applySize() {
@@ -100,12 +142,18 @@
   }
 
   function load() {
-    var base = document.getElementById("baseUrl").value.replace(/\/$/, "");
-    document.getElementById("screen").src = base + currentPath;
+    if (mode === "static") {
+      document.getElementById("screen").src = currentStatic;
+    } else {
+      var base = document.getElementById("baseUrl").value.replace(/\/$/, "");
+      document.getElementById("screen").src = base + currentLive;
+    }
   }
 
   function reload() { load(); }
 
+  document.getElementById("tabStatic").addEventListener("click", function () { setMode("static"); });
+  document.getElementById("tabLive").addEventListener("click", function () { setMode("live"); });
   document.getElementById("baseUrl").addEventListener("change", load);
   applySize();
   render();
