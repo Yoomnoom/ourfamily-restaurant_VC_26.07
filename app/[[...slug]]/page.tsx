@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { startRegistration } from "@simplewebauthn/browser";
 import { mealSummary } from "../../lib/data.mjs";
 
@@ -69,26 +69,34 @@ function MealCard({ meal, profile, compact = false, onChanged }: { meal: Meal; p
   const summary = mealSummary(meal);
   const mine = meal.meal_responses.find((item) => item.profile_id === profile.id);
   const [busy, setBusy] = useState(false);
+  const submittingRef = useRef(false);
 
   const respond = async (status: "attending" | "absent") => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setBusy(true);
     try {
       await api(`/api/meals/${meal.id}/responses`, { method: "POST", body: JSON.stringify({ status, arrivalTime: status === "attending" ? meal.time : "" }) });
       onChanged();
     } finally {
+      submittingRef.current = false;
       setBusy(false);
     }
   };
 
   const confirm = async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setBusy(true);
     try {
       await api(`/api/meals/${meal.id}`, { method: "PATCH", body: JSON.stringify({ status: "confirmed" }) });
       onChanged();
     } finally {
+      submittingRef.current = false;
       setBusy(false);
     }
   };
+
 
   return (
     <article className={`card meal-card ${compact ? "compact" : ""}`}>
@@ -385,11 +393,16 @@ function OverlayPanel({
 function Onboarding({ onReady }: { onReady: () => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // state 업데이트는 비동기라 disabled=busy만으로는 빠른 연속 클릭을 못 막을 때가 있다.
+  // ref는 같은 틱에서 즉시 반영되므로 여기서 먼저 막는다.
+  const submittingRef = useRef(false);
 
   const createHousehold = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (submittingRef.current) return;
     const name = String(new FormData(event.currentTarget).get("name") || "").trim();
     if (!name) return;
+    submittingRef.current = true;
     setBusy(true);
     setError("");
     try {
@@ -398,14 +411,17 @@ function Onboarding({ onReady }: { onReady: () => void }) {
     } catch {
       setError("가구를 만들지 못했어요. 잠시 후 다시 시도해주세요.");
     } finally {
+      submittingRef.current = false;
       setBusy(false);
     }
   };
 
   const joinHousehold = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (submittingRef.current) return;
     const code = String(new FormData(event.currentTarget).get("code") || "").trim();
     if (!code) return;
+    submittingRef.current = true;
     setBusy(true);
     setError("");
     try {
@@ -414,6 +430,7 @@ function Onboarding({ onReady }: { onReady: () => void }) {
     } catch {
       setError("초대 코드가 올바르지 않거나 만료됐어요.");
     } finally {
+      submittingRef.current = false;
       setBusy(false);
     }
   };
@@ -670,6 +687,7 @@ function NewMeal({ householdId, onCreated }: { householdId: string; onCreated: (
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [shareUrl, setShareUrl] = useState("");
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     api(`/api/households/${householdId}/members`).then((body) => setMembers(body.members));
@@ -677,6 +695,8 @@ function NewMeal({ householdId, onCreated }: { householdId: string; onCreated: (
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     const form = new FormData(event.currentTarget);
     setBusy(true);
     setError("");
@@ -698,6 +718,7 @@ function NewMeal({ householdId, onCreated }: { householdId: string; onCreated: (
     } catch {
       setError("식사를 만들지 못했어요. 잠시 후 다시 시도해주세요.");
     } finally {
+      submittingRef.current = false;
       setBusy(false);
     }
   };
@@ -778,6 +799,7 @@ function Respond({ token }: { token: string }) {
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     api(`/api/respond/${token}`)
@@ -795,6 +817,8 @@ function Respond({ token }: { token: string }) {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     const form = new FormData(event.currentTarget);
     setBusy(true);
     setError("");
@@ -814,6 +838,7 @@ function Respond({ token }: { token: string }) {
     } catch {
       setError("응답을 보내지 못했어요. 잠시 후 다시 시도해주세요.");
     } finally {
+      submittingRef.current = false;
       setBusy(false);
     }
   };

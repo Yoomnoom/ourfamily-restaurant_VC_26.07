@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, Suspense, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
 
@@ -13,6 +13,8 @@ function LoginForm() {
   const [passkeySupported, setPasskeySupported] = useState(false);
   const [passkeyMessage, setPasskeyMessage] = useState("");
   const [passkeyBusy, setPasskeyBusy] = useState(false);
+  const submittingRef = useRef(false);
+  const passkeyRef = useRef(false);
 
   useEffect(() => {
     fetch("/api/me").then((response) => {
@@ -26,16 +28,24 @@ function LoginForm() {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setStatus("sending");
-    const response = await fetch("/api/auth/magic-link", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, next })
-    });
-    setStatus(response.ok ? "sent" : "error");
+    try {
+      const response = await fetch("/api/auth/magic-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, next })
+      });
+      setStatus(response.ok ? "sent" : "error");
+    } finally {
+      submittingRef.current = false;
+    }
   };
 
   const loginWithPasskey = async () => {
+    if (passkeyRef.current) return;
+    passkeyRef.current = true;
     setPasskeyBusy(true);
     setPasskeyMessage("");
     try {
@@ -53,6 +63,7 @@ function LoginForm() {
     } catch {
       setPasskeyMessage("지문 로그인에 실패했어요. 먼저 이메일 링크로 로그인한 뒤 등록해주세요.");
     } finally {
+      passkeyRef.current = false;
       setPasskeyBusy(false);
     }
   };
