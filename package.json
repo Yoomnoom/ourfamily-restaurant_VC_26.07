@@ -11,7 +11,7 @@
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.112.3",
-    "next": "latest",
+    "next": "15.5.23",
     "react": "latest",
     "react-dom": "latest",
     "server-only": "^0.0.1"
@@ -20,6 +20,6 @@
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "typescript": "latest"
+    "typescript": "6.0.3"
   }
 }
