@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 오류·복구 상태</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff", "error": "#ba1a1a", "error-container": "#ffdad6", "on-error-container": "#93000a"
+              },
+              "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "headline-lg": ["18px", { "lineHeight": "25px", "fontWeight": "600" }],
+                      "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                      "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>body { -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen">
+<main class="w-full max-w-[1400px] mx-auto px-6 py-10">
+
+<h1 class="text-2xl font-semibold text-on-surface mb-1">오류·복구 상태 참고 시트</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-8">GPT자료 기반 12종. 실제로는 각 화면 안에서 조건부로 나타남 - 카드 하단에 어느 화면에 붙는지 표기.</p>
+
+<div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+</main>
+
+<script>
+    var CASES = [
+        { n: 43, icon: 'mark_email_unread', title: '인증번호를 보내지 못했어요', body: '잠시 후 다시 시도해주세요.', actions: ['다시 보내기', '휴대폰 번호 확인'], to: '2-2. 로그인' },
+        { n: 44, icon: 'schedule', title: '인증시간이 지났어요', body: '새 인증번호를 받아 다시 입력해주세요.', actions: ['새 인증번호 받기'], to: '2-2. 로그인' },
+        { n: 45, icon: 'warning', title: '필수 항목을 확인해주세요', body: '날짜 · 시간 · 메뉴를 입력해야 다음으로 갈 수 있어요.', actions: ['확인하고 계속'], to: '3-2. 식사 만들기' },
+        { n: 46, icon: 'wifi_off', title: '인터넷 연결을 확인해주세요', body: '연결이 끊어졌어요. 네트워크를 확인한 후 다시 시도해주세요.', actions: ['다시 시도', '입력 내용 유지'], to: '전역(모든 저장 동작)' },
+        { n: 47, icon: 'cloud_off', title: '응답을 저장하지 못했어요', body: '잠시 후 다시 저장해주세요. 입력한 내용은 유지돼요.', actions: ['다시 저장'], to: '3-3. 참여자 응답' },
+        { n: 48, icon: 'link_off', title: '링크 사용기간이 끝났어요', body: '이 링크는 더 이상 사용할 수 없어요. 호스트에게 새 링크를 요청해주세요.', actions: ['호스트에게 새 링크 요청'], to: '3-3. 참여자 응답 (진입 전)' },
+        { n: 49, icon: 'error', title: '올바르지 않은 링크예요', body: '링크 주소를 다시 확인해주세요.', actions: ['홈으로'], to: '3-3. 참여자 응답 (진입 전)' },
+        { n: 50, icon: 'person_off', title: '이 링크는 다른 참여자용이에요', body: '이 링크로는 응답을 제출할 수 없어요. 내 링크를 다시 받아 참여해주세요.', actions: ['내 링크 다시 받기'], to: '3-3. 참여자 응답 (진입 전)' },
+        { n: 51, icon: 'event_busy', title: '호스트가 이 식사를 취소했어요', body: '다른 식사 일정을 확인해주세요.', actions: ['홈으로'], to: '3-1. 내 식탁' },
+        { n: 52, icon: 'delete', title: '존재하지 않는 식사예요', body: '삭제되었거나 더 이상 볼 수 없는 식사예요.', actions: ['식사 목록으로'], to: '4-1. 홈 달력뷰 (인라인 패널)' },
+        { n: 53, icon: 'lock', title: '이미 최종 인원이 확정됐어요', body: '확정된 응답은 수정할 수 없어요.', actions: ['식사 목록으로', '호스트에게 문의'], to: '3-3 · 3-4' },
+        { n: 54, icon: 'lock_person', title: '현재 이 가구를 볼 수 없어요', body: '이 가구에서 내 계정이 삭제되었을 수 있어요. 호스트에게 문의하거나 다른 가구를 확인해주세요.', actions: ['다른 가구 확인', '로그아웃'], to: '5-1. 가구 설정' }
+    ];
+
+    var grid = document.getElementById('grid');
+    CASES.forEach(function (c) {
+        var card = document.createElement('div');
+        card.className = 'bg-surface-container-lowest rounded-xl p-5 shadow-[0px_4px_12px_rgba(120,119,119,0.08)] flex flex-col';
+        var actionsHtml = c.actions.map(function (a, i) {
+            return '<button class="' + (i === 0 ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant') + ' font-label-sm text-label-sm px-3 py-2 rounded-full">' + a + '</button>';
+        }).join('');
+        card.innerHTML =
+            '<div class="flex items-center gap-2 mb-3">' +
+            '<span class="font-label-sm text-label-sm text-on-surface-variant">#' + c.n + '</span>' +
+            '<span class="w-8 h-8 rounded-full bg-error-container text-on-error-container flex items-center justify-center"><span class="material-symbols-outlined text-[18px]">' + c.icon + '</span></span>' +
+            '</div>' +
+            '<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">' + c.title + '</h2>' +
+            '<p class="font-body-md text-body-md text-on-surface-variant mb-4 flex-1">' + c.body + '</p>' +
+            '<div class="flex flex-wrap gap-2 mb-3">' + actionsHtml + '</div>' +
+            '<p class="font-label-sm text-label-sm text-on-surface-variant border-t border-outline-variant pt-2">붙는 화면: ' + c.to + '</p>';
+        grid.appendChild(card);
+    });
+</script>
+</body></html>

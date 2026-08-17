@@ -1,0 +1,129 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 링크 공유</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff", "tertiary-container": "#fef4e9", "on-tertiary-container": "#766f66"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bg-on-surface text-surface font-label-sm text-label-sm px-4 py-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300" style="bottom:24px; z-index:100;"></div>
+
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset py-section-margin">
+
+<div class="flex items-center gap-2 bg-tertiary-container text-on-tertiary-container rounded-xl px-4 py-3 mb-6">
+<span class="material-symbols-outlined">check_circle</span>
+<p class="font-body-md text-body-md">식사가 생성됐어요! 참여자에게 링크를 보내주세요.</p>
+</div>
+
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-3">참여자별 응답 링크</h1>
+
+<div id="linkList" class="flex flex-col gap-3 mb-8"></div>
+
+<button class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-[0.98] transition-transform" onclick="window.location.href='../3-1. 내 식탁/code.html'">홈으로</button>
+
+</main>
+
+<script>
+    var toastTimer;
+    function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.remove('opacity-0');
+        toast.classList.add('opacity-100');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('opacity-100'); toast.classList.add('opacity-0'); }, 2600);
+    }
+
+    var AVATAR_COLORS = ['#8a9a7b', '#9b8ab5', '#c98a5a', '#5f8fa3', '#b57a7a'];
+
+    function copyLink(url, btn) {
+        var fallback = function () {
+            var original = btn.textContent;
+            btn.textContent = '복사됨';
+            setTimeout(function () { btn.textContent = original; }, 1200);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(fallback, fallback);
+        } else { fallback(); }
+    }
+
+    (function init() {
+        var meal = null;
+        try { meal = JSON.parse(localStorage.getItem('draft_meal') || 'null'); } catch (err) {}
+        var participants = (meal && meal.participants && meal.participants.length) ? meal.participants : ['김영희 (나)', '박철수', '이지은'];
+
+        var list = document.getElementById('linkList');
+        participants.forEach(function (name, i) {
+            var token = Math.random().toString(36).slice(2, 8);
+            var url = 'woorijip.kr/meal/' + token;
+
+            var row = document.createElement('div');
+            row.className = 'bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)]';
+
+            var top = document.createElement('div');
+            top.className = 'flex items-center gap-2.5 mb-2';
+            top.innerHTML =
+                '<span class="w-8 h-8 rounded-full flex items-center justify-center text-on-primary font-label-sm text-label-sm shrink-0" style="background-color:' + AVATAR_COLORS[i % AVATAR_COLORS.length] + ';">' + name.trim().charAt(0) + '</span>' +
+                '<span class="font-body-md text-body-md text-on-surface flex-1">' + name + '</span>';
+            row.appendChild(top);
+
+            var linkLine = document.createElement('p');
+            linkLine.className = 'font-label-sm text-label-sm text-on-surface-variant mb-3';
+            linkLine.textContent = url;
+            row.appendChild(linkLine);
+
+            var actions = document.createElement('div');
+            actions.className = 'flex flex-col gap-2';
+
+            var topRow = document.createElement('div');
+            topRow.className = 'flex gap-2';
+
+            var copyBtn = document.createElement('button');
+            copyBtn.type = 'button';
+            copyBtn.className = 'flex-1 py-2.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm';
+            copyBtn.textContent = '복사';
+            copyBtn.onclick = function () { copyLink(url, copyBtn); };
+            topRow.appendChild(copyBtn);
+
+            var shareBtn = document.createElement('button');
+            shareBtn.type = 'button';
+            shareBtn.className = 'flex-1 py-2.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap';
+            shareBtn.textContent = '카카오톡';
+            shareBtn.onclick = function () { showToast('카카오톡 공유는 실제 서비스에서 연동돼요.'); };
+            topRow.appendChild(shareBtn);
+            actions.appendChild(topRow);
+
+            var previewBtn = document.createElement('button');
+            previewBtn.type = 'button';
+            previewBtn.className = 'w-full py-2.5 rounded-full border border-outline-variant text-on-surface-variant font-label-sm text-label-sm';
+            previewBtn.textContent = '미리보기';
+            previewBtn.onclick = function () { window.location.href = '../3-3. 참여자 응답/code.html?name=' + encodeURIComponent(name.replace(' (나)', '')); };
+            actions.appendChild(previewBtn);
+
+            row.appendChild(actions);
+            list.appendChild(row);
+        });
+    })();
+</script>
+</body></html>

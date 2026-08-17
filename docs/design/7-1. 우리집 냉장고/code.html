@@ -1,0 +1,456 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 우리집 냉장고</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff", "tertiary-container": "#fef4e9", "on-tertiary-container": "#766f66",
+                      "error": "#ba1a1a", "error-container": "#ffdad6", "on-error-container": "#93000a"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "display-serif": ["Noto Serif"], "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "display-serif": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>
+    body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }
+    @keyframes pulse-ring { 0% { transform: scale(0.9); opacity: 0.6; } 100% { transform: scale(1.3); opacity: 0; } }
+    .pulse-ring { animation: pulse-ring 1.6s ease-out infinite; }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset pt-section-margin pb-28 relative">
+
+<header class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1; font-size: 26px;">restaurant</span>
+<span class="font-display-serif text-display-serif text-on-surface">우리집식당</span>
+</header>
+
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-1">우리집 냉장고</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">가구가 함께 쓰는 재료예요. 식사를 만들 때 여기서 메뉴를 추천받을 수 있어요.</p>
+
+<!-- 전체 개수 요약은 유지 — "곧 상해요"는 상위 2개만 보여주니, 목록을 안 펼쳐도 전체 현황을 알 수 있어야 함 -->
+<div class="grid grid-cols-3 gap-2 mb-6">
+<div class="bg-surface-container-lowest rounded-xl p-3 text-center shadow-[0px_4px_12px_rgba(120,119,119,0.08)]">
+<p id="freshCount" class="font-headline-lg text-headline-lg" style="color:#6b7f5c;">0</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">신선해요</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3 text-center shadow-[0px_4px_12px_rgba(120,119,119,0.08)]">
+<p id="expiringCount" class="font-headline-lg text-headline-lg text-on-tertiary-container">0</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">소비 임박</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3 text-center shadow-[0px_4px_12px_rgba(120,119,119,0.08)]">
+<p id="urgentCount" class="font-headline-lg text-headline-lg text-error">0</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">오늘 소진</p>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center mb-4">신선도는 실제 소비기한이 아니라 <b>등록 후 며칠 지났는지</b>로 추정해요.</p>
+
+<!-- 재료 추가: 검색(직접 입력) 한 줄 + 그 아래 "사진·영수증 한 번에 등록"을 문장으로 명확하게 -->
+<div class="flex gap-2 mb-2">
+<input id="addName" type="text" placeholder="재료 이름" class="flex-1 min-w-0 border border-outline-variant rounded-full px-4 py-2.5 font-body-md text-body-md bg-surface-container-lowest" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('addQty').focus();}">
+<input id="addQty" type="text" placeholder="수량" class="w-20 border border-outline-variant rounded-full px-3 py-2.5 font-body-md text-body-md bg-surface-container-lowest" onkeydown="if(event.key==='Enter'){event.preventDefault();addIngredient();}">
+<button type="button" class="w-11 h-11 rounded-full bg-on-surface text-surface flex items-center justify-center shrink-0 active:scale-95 transition-transform" onclick="addIngredient()" aria-label="재료 추가">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<!-- 페이지 이동은 없애되, 사진/영수증을 "실제로 고르는" 동작 자체는 진짜여야 함 — 그걸 건너뛰고 바로 가짜 결과로 넘어가면 목업을 대충 만든 것.
+     1-1의 프로필 사진과 같은 방식(진짜 input type="file")으로, 카메라·영수증 둘 다 실제 파일 선택을 거침. AI 인식 결과만 목업. -->
+<div id="photoEntryRow" class="flex gap-2 mb-6">
+<label class="flex-1 bg-surface-container-lowest rounded-xl px-3 py-3 shadow-[0px_2px_8px_rgba(120,119,119,0.06)] flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined text-primary text-[20px]">photo_camera</span>
+<span class="font-label-sm text-label-sm text-on-surface">냉장고 사진</span>
+<input type="file" id="fridgePhotoInput" accept="image/*" capture="environment" class="hidden">
+</label>
+<label class="flex-1 bg-surface-container-lowest rounded-xl px-3 py-3 shadow-[0px_2px_8px_rgba(120,119,119,0.06)] flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined text-primary text-[20px]">receipt_long</span>
+<span class="font-label-sm text-label-sm text-on-surface">영수증</span>
+<input type="file" id="receiptPhotoInput" accept="image/*" class="hidden">
+</label>
+</div>
+
+<div id="analyzingCard" class="hidden bg-surface-container-lowest rounded-xl p-5 mb-6 text-center">
+<div class="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+<img id="analyzePreviewImg" class="hidden w-full h-full object-cover rounded-full" alt="선택한 사진">
+<span id="analyzePulseWrap" class="absolute inset-0 rounded-full bg-tertiary-container pulse-ring"></span>
+<span id="analyzeDefaultIcon" class="material-symbols-outlined text-primary relative" style="font-size:32px;">nutrition</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mb-1">AI가 재료를 찾고 있어요</p>
+<div id="analyzeChecklist" class="flex flex-col gap-1.5 text-left max-w-[220px] mx-auto mt-3"></div>
+</div>
+
+<div id="analyzeResultCard" class="hidden bg-surface-container-lowest rounded-xl p-5 mb-6">
+<div class="flex items-center gap-2 bg-tertiary-container text-on-tertiary-container rounded-xl px-4 py-3 mb-4">
+<span class="material-symbols-outlined">check_circle</span>
+<p class="font-body-md text-body-md">총 <span id="analyzeFoundCount">0</span>가지 재료를 찾았어요!</p>
+</div>
+<div id="analyzeResultGrid" class="grid grid-cols-3 gap-2 mb-4"></div>
+<button type="button" class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-3 rounded-full active:scale-[0.98] transition-transform" onclick="confirmInlineAnalysis()">냉장고에 추가</button>
+</div>
+
+<!-- 곧 상해요: 목록의 색점(상태 표시)과는 다른 역할 — 여긴 "그래서 뭘 하면 좋은지" 조언 문장. 재고 목록과 중복 아님. -->
+<section id="expiringSection" class="hidden mb-6">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-3 px-1">곧 상해요</h2>
+<div id="expiringCard" class="bg-tertiary-container rounded-xl p-4 flex flex-col gap-1.5"></div>
+</section>
+
+<div class="flex items-center justify-between mb-3">
+<h2 id="fridgeCountLabel" class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide">재료</h2>
+<button class="font-label-sm text-label-sm text-primary" onclick="window.location.href='../7-3. 메뉴 추천/code.html'">이 재료로 메뉴 추천받기 →</button>
+</div>
+<div id="fridgeList" class="flex flex-col gap-2 mb-6"></div>
+
+<!-- 밀키트 제안: 있을 때만, 조용히 -->
+<section id="milkitSuggestSection" class="hidden mb-4">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-3 px-1">✨ 밀키트 제안</h2>
+<div id="milkitSuggestList" class="flex flex-col gap-2"></div>
+</section>
+
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center">제안은 필요할 때만 조용히 보여요. 알림으로 재촉하지 않아요.</p>
+
+</main>
+
+<nav class="fixed bottom-0 left-0 right-0 z-10 bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant" style="padding-bottom: env(safe-area-inset-bottom);">
+<div class="max-w-[600px] mx-auto flex items-stretch">
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../3-0. 홈/code.html'">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">홈</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../3-1. 내 식탁/code.html'">
+<span class="material-symbols-outlined">table_restaurant</span>
+<span class="font-label-sm text-label-sm">내 식탁</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../4-1. 홈 달력뷰/code.html'">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-label-sm">달력</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">kitchen</span>
+<span class="font-label-sm text-label-sm">냉장고</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../5-3. 설정/code.html'">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm text-label-sm">설정</span>
+</button>
+</div>
+</nav>
+
+<script>
+    // 신선도는 등록일부터 며칠 지났는지로 실제 계산함(예전엔 freshness를 그냥 값으로 박아뒀었음 — 등록일도
+    // 소비기한도 없는데 "신선함"을 무슨 근거로 표시하냐는 지적이 맞아서 고침).
+    // ponytail: 재료마다 실제 유통기한은 다 다르지만, 그 기준표를 따로 만드는 건 이 규모에 과함 —
+    // "며칠째 있었는지"로 뭉뚱그린 근사치. 나중에 재료별 기준일수가 필요해지면 그때 추가.
+    function todayISO() {
+        var d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function dateMinusDays(n) {
+        var d = new Date();
+        d.setDate(d.getDate() - n);
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function daysSince(dateStr) {
+        var then = new Date(dateStr + 'T00:00:00');
+        var now = new Date();
+        return Math.floor((now - then) / 86400000);
+    }
+    function computeFreshness(item) {
+        if (!item.addedAt) return item.freshness || 'fresh'; // addedAt 없는 옛 데이터(예: 7-2 사진분석 결과) 대비
+        var d = daysSince(item.addedAt);
+        if (d >= 5) return 'urgent';
+        if (d >= 3) return 'expiring';
+        return 'fresh';
+    }
+
+    // "등록일 기준 추정"이라는 근거를 실제로 화면에 보여줌 — 색점만 있고 왜 그런지 안 보이면 신뢰할 수 없음.
+    function fridgeDateLabel(item) {
+        if (!item.addedAt) return '';
+        var d = daysSince(item.addedAt);
+        return d <= 0 ? '오늘 등록' : '등록 ' + d + '일째';
+    }
+
+    var DEFAULT_FRIDGE = [
+        { name: '감자', emoji: '🥔', qty: '3개', addedAt: dateMinusDays(2) },
+        { name: '계란', emoji: '🥚', qty: '6알', addedAt: dateMinusDays(1) },
+        { name: '양파', emoji: '🧅', qty: '2개', addedAt: dateMinusDays(3) },
+        { name: '대파', emoji: '🌱', qty: '1단', addedAt: dateMinusDays(5) },
+        { name: '치즈', emoji: '🧀', qty: '200g', addedAt: dateMinusDays(2) },
+        { name: '당근', emoji: '🥕', qty: '2개', addedAt: dateMinusDays(4) },
+        { name: '시금치', emoji: '🥬', qty: '1단', addedAt: dateMinusDays(6) },
+        { name: '우유', emoji: '🥛', qty: '1L', addedAt: dateMinusDays(1) },
+        { name: '버섯', emoji: '🍄', qty: '1팩', addedAt: dateMinusDays(4) }
+    ];
+
+    function loadFridge() {
+        var fridge = null;
+        try { fridge = JSON.parse(localStorage.getItem('household_fridge') || 'null'); } catch (err) {}
+        if (!fridge) {
+            fridge = DEFAULT_FRIDGE;
+            try { localStorage.setItem('household_fridge', JSON.stringify(fridge)); } catch (err) {}
+        }
+        return fridge;
+    }
+    function saveFridge() {
+        try { localStorage.setItem('household_fridge', JSON.stringify(fridge)); } catch (err) {}
+    }
+
+    var fridge = loadFridge();
+
+    function addIngredient() {
+        var nameInput = document.getElementById('addName');
+        var qtyInput = document.getElementById('addQty');
+        var name = nameInput.value.trim();
+        if (!name) return;
+        fridge.push({ name: name, emoji: '📦', qty: qtyInput.value.trim() || '1개', addedAt: todayISO() });
+        saveFridge();
+        nameInput.value = '';
+        qtyInput.value = '';
+        nameInput.focus();
+        renderAll();
+    }
+
+    function removeIngredient(index) {
+        fridge.splice(index, 1);
+        saveFridge();
+        renderAll();
+    }
+
+    // 사진·영수증 분석을 이 화면 안에서 바로 — 원래 7-2로 이동시켰지만, 거기 두 버튼(냉장고 사진/영수증)이
+    // 결국 똑같이 동작해서 페이지만 왔다갔다 하는 비용이었음. 그 결과만 여기로 그대로 가져옴.
+    var ANALYZE_FOUND = [
+        { name: '감자', emoji: '🥔', confidence: 98 },
+        { name: '계란', emoji: '🥚', confidence: 99 },
+        { name: '양파', emoji: '🧅', confidence: 97 },
+        { name: '대파', emoji: '🌱', confidence: 95 },
+        { name: '치즈', emoji: '🧀', confidence: 94 },
+        { name: '당근', emoji: '🥕', confidence: 93 },
+        { name: '시금치', emoji: '🥬', confidence: 92 },
+        { name: '우유', emoji: '🥛', confidence: 91 },
+        { name: '버섯', emoji: '🍄', confidence: 90 }
+    ];
+    var ANALYZE_STEPS = ['사진 분석 중...', '식재료 인식 중...', '재료 정보 확인 중...', '신선도 분석 중...'];
+
+    // 사진을 실제로 골라야(카메라든 영수증이든) 분석이 시작됨 — 고르는 동작 자체를 생략하지 않음.
+    document.getElementById('fridgePhotoInput').addEventListener('change', function (e) { handlePhotoSelected(e); });
+    document.getElementById('receiptPhotoInput').addEventListener('change', function (e) { handlePhotoSelected(e); });
+
+    function handlePhotoSelected(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (e) { startInlineAnalysis(e.target.result); };
+        reader.readAsDataURL(file);
+    }
+
+    function startInlineAnalysis(previewDataUrl) {
+        document.getElementById('photoEntryRow').classList.add('hidden');
+        document.getElementById('analyzingCard').classList.remove('hidden');
+
+        // 실제로 고른 사진을 미리보기로 보여줌 — AI 인식 결과는 목업이지만 "무슨 사진으로" 분석 중인지는 진짜.
+        if (previewDataUrl) {
+            var img = document.getElementById('analyzePreviewImg');
+            img.src = previewDataUrl;
+            img.classList.remove('hidden');
+            document.getElementById('analyzeDefaultIcon').classList.add('hidden');
+            document.getElementById('analyzePulseWrap').classList.add('hidden');
+        }
+
+        var checklist = document.getElementById('analyzeChecklist');
+        checklist.innerHTML = '';
+        ANALYZE_STEPS.forEach(function (label) {
+            var row = document.createElement('div');
+            row.className = 'flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant';
+            row.innerHTML = '<span class="material-symbols-outlined text-[16px] text-outline-variant step-icon">radio_button_unchecked</span><span>' + label + '</span>';
+            checklist.appendChild(row);
+        });
+
+        var rows = checklist.querySelectorAll('.step-icon');
+        var i = 0;
+        var timer = setInterval(function () {
+            if (i < rows.length) {
+                rows[i].textContent = 'check_circle';
+                rows[i].style.color = '#6b7f5c';
+                i++;
+            } else {
+                clearInterval(timer);
+                showInlineResult();
+            }
+        }, 400);
+    }
+
+    function showInlineResult() {
+        document.getElementById('analyzingCard').classList.add('hidden');
+        document.getElementById('analyzeResultCard').classList.remove('hidden');
+        document.getElementById('analyzeFoundCount').textContent = ANALYZE_FOUND.length;
+
+        var grid = document.getElementById('analyzeResultGrid');
+        grid.innerHTML = '';
+        ANALYZE_FOUND.forEach(function (item) {
+            var cell = document.createElement('div');
+            cell.className = 'bg-surface-container rounded-xl p-2.5 text-center';
+            cell.innerHTML = '<div class="text-xl mb-1">' + item.emoji + '</div>' +
+                '<p class="font-label-sm text-label-sm text-on-surface">' + item.name + '</p>' +
+                '<p class="font-label-sm text-label-sm text-on-surface-variant">' + item.confidence + '%</p>';
+            grid.appendChild(cell);
+        });
+    }
+
+    function confirmInlineAnalysis() {
+        var existingNames = fridge.map(function (f) { return f.name; });
+        ANALYZE_FOUND.forEach(function (item) {
+            if (existingNames.indexOf(item.name) === -1) {
+                fridge.push({ name: item.name, emoji: item.emoji, qty: '1개', addedAt: todayISO() });
+            }
+        });
+        saveFridge();
+        document.getElementById('analyzeResultCard').classList.add('hidden');
+        document.getElementById('photoEntryRow').classList.remove('hidden');
+        // 다음에 또 쓸 수 있게 미리보기·입력값 초기화
+        document.getElementById('analyzePreviewImg').classList.add('hidden');
+        document.getElementById('analyzeDefaultIcon').classList.remove('hidden');
+        document.getElementById('analyzePulseWrap').classList.remove('hidden');
+        document.getElementById('fridgePhotoInput').value = '';
+        document.getElementById('receiptPhotoInput').value = '';
+        renderAll();
+    }
+
+    var FRIDGE_PREVIEW_COUNT = 6; // 사진으로 계속 추가되는 목록이라 무한정 길어지지 않게 — 더보기로 펼침
+    var fridgeExpanded = false;
+
+    function renderFridgeList() {
+        var list = document.getElementById('fridgeList');
+        list.innerHTML = '';
+        document.getElementById('fridgeCountLabel').textContent = '재료 ' + fridge.length + '개';
+
+        if (!fridge.length) {
+            var empty = document.createElement('p');
+            empty.className = 'font-label-sm text-label-sm text-on-surface-variant text-center py-6';
+            empty.textContent = '아직 등록된 재료가 없어요.';
+            list.appendChild(empty);
+            return;
+        }
+
+        var DOT_COLOR = { fresh: '#8fae7a', expiring: '#c9922f', urgent: '#ba1a1a' };
+        var URGENCY_RANK = { urgent: 0, expiring: 1, fresh: 2 };
+        // 급한 재료를 별도 카드로 또 보여주는 대신, 목록 자체를 급한 순서로 정렬 — 같은 정보를 두 번 안 보여줌.
+        var sorted = fridge.slice().sort(function (a, b) { return URGENCY_RANK[computeFreshness(a)] - URGENCY_RANK[computeFreshness(b)]; });
+        var visible = fridgeExpanded ? sorted : sorted.slice(0, FRIDGE_PREVIEW_COUNT);
+        visible.forEach(function (item) {
+            var index = fridge.indexOf(item);
+            var freshness = computeFreshness(item);
+            var row = document.createElement('div');
+            row.className = 'bg-surface-container-lowest rounded-xl px-4 py-3 shadow-[0px_4px_12px_rgba(120,119,119,0.08)] flex items-center gap-3';
+            row.innerHTML =
+                '<span class="w-2 h-2 rounded-full shrink-0" style="background:' + DOT_COLOR[freshness] + ';" title="' + (freshness === 'urgent' ? '오늘 소진' : freshness === 'expiring' ? '소비 임박' : '신선해요') + '"></span>' +
+                '<span class="flex-1 min-w-0">' +
+                '<span class="font-body-md text-body-md text-on-surface block">' + item.name + ' · ' + (item.qty || '1개') + '</span>' +
+                '<span class="font-label-sm text-label-sm text-on-surface-variant block">' + fridgeDateLabel(item) + '</span>' +
+                '</span>' +
+                '<button type="button" class="remove-btn w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant shrink-0" aria-label="삭제"><span class="material-symbols-outlined text-[20px]">delete</span></button>';
+            row.querySelector('.remove-btn').onclick = function () { removeIngredient(index); };
+            list.appendChild(row);
+        });
+
+        if (!fridgeExpanded && fridge.length > FRIDGE_PREVIEW_COUNT) {
+            var moreBtn = document.createElement('button');
+            moreBtn.type = 'button';
+            moreBtn.className = 'w-full text-center font-label-sm text-label-sm text-primary py-1.5';
+            moreBtn.textContent = '+ ' + (fridge.length - FRIDGE_PREVIEW_COUNT) + '개 더보기';
+            moreBtn.onclick = function () { fridgeExpanded = true; renderFridgeList(); };
+            list.appendChild(moreBtn);
+        } else if (fridgeExpanded && fridge.length > FRIDGE_PREVIEW_COUNT) {
+            var lessBtn = document.createElement('button');
+            lessBtn.type = 'button';
+            lessBtn.className = 'w-full text-center font-label-sm text-label-sm text-on-surface-variant py-1.5';
+            lessBtn.textContent = '접기';
+            lessBtn.onclick = function () { fridgeExpanded = false; renderFridgeList(); };
+            list.appendChild(lessBtn);
+        }
+    }
+
+    function renderExpiringSection() {
+        var section = document.getElementById('expiringSection');
+        var card = document.getElementById('expiringCard');
+        var urgent = fridge.filter(function (f) { var s = computeFreshness(f); return s === 'urgent' || s === 'expiring'; })
+            .sort(function (a, b) { return (computeFreshness(a) === 'urgent' ? 0 : 1) - (computeFreshness(b) === 'urgent' ? 0 : 1); })
+            .slice(0, 2);
+        if (!urgent.length) { section.classList.add('hidden'); return; }
+        section.classList.remove('hidden');
+        card.innerHTML = '';
+        urgent.forEach(function (item) {
+            var line = document.createElement('p');
+            line.className = 'font-body-md text-body-md text-on-tertiary-container';
+            line.innerHTML = '<b>' + item.name + '</b>(' + fridgeDateLabel(item) + ') — 다음 집밥에 먼저 쓰면 좋아요.';
+            card.appendChild(line);
+        });
+    }
+
+    // 7-3(메뉴 추천)과 같은 레시피·매칭 로직을 재사용 — 화면마다 다른 기준으로 추천하면 안 되니까.
+    var RECIPES = [
+        { name: '감자볶음', emoji: '🍳', time: '15분', needs: ['감자', '양파', '대파', '당근'] },
+        { name: '오믈렛', emoji: '🍳', time: '20분', needs: ['계란', '양파', '치즈'] },
+        { name: '된장찌개', emoji: '🍲', time: '30분', needs: ['감자', '양파', '버섯', '대파'] },
+        { name: '크림파스타', emoji: '🍝', time: '25분', needs: ['우유', '치즈', '버섯'] }
+    ];
+
+    function renderMilkitSuggestions() {
+        var section = document.getElementById('milkitSuggestSection');
+        var list = document.getElementById('milkitSuggestList');
+        var fridgeNames = fridge.map(function (f) { return f.name; });
+        var scored = RECIPES.map(function (r) {
+            var owned = r.needs.filter(function (n) { return fridgeNames.indexOf(n) !== -1; });
+            var missing = r.needs.filter(function (n) { return fridgeNames.indexOf(n) === -1; });
+            return { recipe: r, owned: owned, missing: missing, match: owned.length / r.needs.length };
+        }).filter(function (s) { return s.missing.length > 0 && s.match >= 0.5; })
+          .sort(function (a, b) { return b.match - a.match; })
+          .slice(0, 2);
+
+        if (!scored.length) { section.classList.add('hidden'); return; }
+        section.classList.remove('hidden');
+        list.innerHTML = '';
+        scored.forEach(function (s) {
+            var row = document.createElement('div');
+            row.className = 'bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] flex items-center justify-between gap-3';
+            row.innerHTML =
+                '<div class="flex-1 min-w-0">' +
+                '<p class="font-body-md text-body-md text-on-surface font-medium">' + s.recipe.name + ' 밀키트</p>' +
+                '<p class="font-label-sm text-label-sm text-on-surface-variant">2인 · ' + s.recipe.time + ' · 지금 있는 재료로 거의 완성돼요</p>' +
+                '</div>' +
+                '<button type="button" class="go-btn shrink-0 px-4 py-2 rounded-full bg-on-surface text-surface font-label-sm text-label-sm">보러가기</button>';
+            row.querySelector('.go-btn').onclick = function () {
+                try { localStorage.setItem('milkit_order', JSON.stringify({ recipeName: s.recipe.name, missing: s.missing })); } catch (err) {}
+                window.location.href = '../8-1. 밀키트 주문/code.html';
+            };
+            list.appendChild(row);
+        });
+    }
+
+    function renderCounts() {
+        document.getElementById('freshCount').textContent = fridge.filter(function (f) { return computeFreshness(f) === 'fresh'; }).length;
+        document.getElementById('expiringCount').textContent = fridge.filter(function (f) { return computeFreshness(f) === 'expiring'; }).length;
+        document.getElementById('urgentCount').textContent = fridge.filter(function (f) { return computeFreshness(f) === 'urgent'; }).length;
+    }
+
+    function renderAll() {
+        renderCounts();
+        renderFridgeList();
+        renderExpiringSection();
+        renderMilkitSuggestions();
+    }
+
+    renderAll();
+</script>
+</body></html>

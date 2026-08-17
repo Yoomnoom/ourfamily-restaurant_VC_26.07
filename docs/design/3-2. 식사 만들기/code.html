@@ -1,0 +1,794 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 식사 만들기</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f6f3f3",
+                      "on-error-container": "#93000a",
+                      "on-secondary": "#ffffff",
+                      "surface-variant": "#e4e2e2",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#e3e2e3",
+                      "surface-container": "#f0eded",
+                      "on-secondary-fixed-variant": "#464748",
+                      "on-error": "#ffffff",
+                      "outline-variant": "#c6c6ca",
+                      "on-tertiary-fixed-variant": "#4b463e",
+                      "on-surface-variant": "#45474a",
+                      "tertiary-fixed-dim": "#cec5bb",
+                      "outline": "#76777b",
+                      "on-primary-container": "#6f7074",
+                      "on-secondary-fixed": "#1b1c1d",
+                      "error-container": "#ffdad6",
+                      "on-primary-fixed": "#1a1c1f",
+                      "inverse-surface": "#303030",
+                      "on-surface": "#1b1c1c",
+                      "secondary-fixed-dim": "#c7c6c7",
+                      "inverse-primary": "#5d5e62",
+                      "secondary-fixed": "#e3e2e3",
+                      "tertiary-fixed": "#ebe1d6",
+                      "error": "#ba1a1a",
+                      "inverse-on-surface": "#f3f0f0",
+                      "surface": "#fbf9f8",
+                      "on-tertiary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#eae7e7",
+                      "tertiary": "#645d55",
+                      "primary": "#5d5e62",
+                      "on-tertiary-container": "#766f66",
+                      "primary-fixed": "#e2e2e6",
+                      "tertiary-container": "#fef4e9",
+                      "primary-container": "#f5f5f9",
+                      "surface-dim": "#dcd9d9",
+                      "surface-container-highest": "#e4e2e2",
+                      "on-secondary-container": "#646465",
+                      "primary-fixed-dim": "#c6c6ca",
+                      "surface-tint": "#5d5e62",
+                      "background": "#fbf9f8",
+                      "secondary": "#5e5e5f",
+                      "on-primary-fixed-variant": "#45474a",
+                      "surface-bright": "#fbf9f8",
+                      "on-background": "#1b1c1c",
+                      "on-tertiary-fixed": "#1f1b15"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-margin": "2rem",
+                      "card-padding": "1.25rem",
+                      "safe-area-inset": "1rem",
+                      "stack-gap": "1rem"
+              },
+              "fontFamily": {
+                      "body-md": ["Plus Jakarta Sans"],
+                      "display-serif": ["Noto Serif"],
+                      "emotional-quote": ["Noto Serif"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "label-sm": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "display-serif": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                      "emotional-quote": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+    body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }
+    .menu-tag.dragging { opacity: 0.4; }
+    .menu-tag { cursor: grab; }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bg-on-surface text-surface font-label-sm text-label-sm px-4 py-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300" style="bottom:calc(100px + env(safe-area-inset-bottom)); z-index:100;"></div>
+
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset py-section-margin pb-32 relative">
+
+<!-- Header -->
+<header class="flex items-center gap-3 mb-6">
+<button class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-95 transition-transform" onclick="window.location.href='../3-1. 내 식탁/code.html'" aria-label="뒤로">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 id="pageTitle" class="font-headline-lg text-headline-lg text-on-surface">새 식사 만들기</h1>
+</header>
+
+<div id="editNotice" class="hidden flex items-center gap-2 bg-tertiary-container text-on-tertiary-container rounded-xl px-4 py-3 mb-6">
+<span class="material-symbols-outlined">link</span>
+<p class="font-body-md text-body-md">수정해도 참여자 응답 링크는 그대로 유지돼요.</p>
+</div>
+
+<!-- 언제 -->
+<section class="mb-6">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-3 px-1">언제</h2>
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] flex flex-col gap-3">
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant mb-1 block">날짜</label>
+<input id="mealDate" type="date" class="w-full border border-outline-variant rounded-lg px-3 py-2.5 font-body-md text-body-md text-on-surface bg-surface-container-lowest" onchange="onDateChanged()">
+</div>
+<div>
+<div class="flex items-center justify-between mb-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant">시간</label>
+<label class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+<input id="timeUndecided" type="checkbox" class="rounded" onchange="toggleTimeInput()">
+시간 미정
+</label>
+</div>
+<input id="mealTime" type="time" value="19:00" class="w-full border border-outline-variant rounded-lg px-3 py-2.5 font-body-md text-body-md text-on-surface bg-surface-container-lowest">
+</div>
+</div>
+
+<details class="mt-3" id="repeatDetails">
+<summary class="font-label-sm text-label-sm text-on-surface-variant cursor-pointer flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">repeat</span>
+반복 일정 (선택) · 매번 만들지 않아도 그 요일엔 자동으로 열려요
+</summary>
+<label class="flex items-center gap-2 mt-3 font-label-sm text-label-sm text-on-surface-variant">
+<input id="repeatToggle" type="checkbox" class="rounded" onchange="toggleRepeatDays()">
+매주 같은 요일에 반복
+</label>
+<div id="repeatDaysRow" class="hidden flex flex-wrap gap-1.5 mt-2"></div>
+
+<div id="activeRulesWrap" class="hidden mt-4 pt-3 border-t border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-2">반복 중인 식사</p>
+<div id="activeRulesList" class="flex flex-col gap-1.5"></div>
+</div>
+</details>
+</section>
+
+<!-- 종류 -->
+<section class="mb-6">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-3 px-1">종류</h2>
+<div id="mealTypeChips" class="flex gap-2">
+<button type="button" class="meal-type-chip flex-1 py-2.5 rounded-full font-label-sm text-label-sm transition-colors" data-type="home" onclick="selectMealType('home')">집밥</button>
+<button type="button" class="meal-type-chip flex-1 py-2.5 rounded-full font-label-sm text-label-sm transition-colors" data-type="eatout" onclick="selectMealType('eatout')">외식</button>
+<button type="button" class="meal-type-chip flex-1 py-2.5 rounded-full font-label-sm text-label-sm transition-colors" data-type="delivery" onclick="selectMealType('delivery')">배달</button>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2 px-1">종류는 달력에는 표시되지 않고, 기록·통계에서만 쓰여요.</p>
+</section>
+
+<!-- 메뉴 -->
+<section class="mb-6">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-3 px-1">메뉴 <span class="normal-case opacity-70">(선택)</span></h2>
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)]">
+<div id="menuList" class="flex flex-col gap-2 mb-3"></div>
+<div class="flex gap-2 mb-3">
+<input id="menuInput" type="text" placeholder="메뉴를 입력하세요 (예: 김치찌개)" class="flex-1 min-w-0 border border-outline-variant rounded-lg px-3 py-2.5 font-body-md text-body-md text-on-surface bg-surface-container-lowest" onkeydown="if(event.key==='Enter'){event.preventDefault();addMenuFromInput();}">
+<button type="button" class="px-4 rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-label-sm" onclick="addMenuFromInput()">추가</button>
+</div>
+<div id="homeOnlyMenuTools">
+<button type="button" class="w-full py-2.5 rounded-lg border border-dashed border-outline-variant text-on-surface-variant font-label-sm text-label-sm flex items-center justify-center gap-2 mb-3" onclick="window.location.href='../7-3. 메뉴 추천/code.html'">
+<span class="material-symbols-outlined text-[18px]">kitchen</span>
+냉장고 재료로 추천받기
+</button>
+<details>
+<summary class="font-label-sm text-label-sm text-on-surface-variant cursor-pointer">▾ 저장된 메뉴에서 담기</summary>
+<div class="flex flex-wrap gap-2 mt-2">
+<button type="button" class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm" onclick="addMenu('계란말이')">계란말이</button>
+<button type="button" class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm" onclick="addMenu('나물무침')">나물무침</button>
+<button type="button" class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm" onclick="addMenu('된장국')">된장국</button>
+</div>
+</details>
+</div>
+
+<div id="eatoutMenuTools" class="hidden">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1.5">자주 가는 곳</p>
+<div id="frequentPlacesRow" class="flex flex-wrap gap-2 mb-3"></div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1.5">요즘 뜨는 곳 <span class="opacity-70 normal-case">(참고용 추천)</span></p>
+<div id="recommendedPlacesRow" class="flex flex-wrap gap-2"></div>
+</div>
+</div>
+
+<button type="button" class="w-full text-center font-label-sm text-label-sm text-primary py-2 mt-2 flex items-center justify-center gap-1.5" onclick="startMenuPoll()">
+<span class="material-symbols-outlined text-[18px]">how_to_vote</span>
+뭐 먹을지 고민되면, 가족에게 골라달라고 하기
+</button>
+
+<div id="activePollWrap" class="hidden mt-3 bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)]">
+<div class="flex items-center justify-between mb-2">
+<p class="font-label-sm text-label-sm text-on-surface-variant">진행 중인 투표</p>
+<button type="button" class="font-label-sm text-label-sm text-error" onclick="cancelMenuPoll()">취소</button>
+</div>
+<div id="pollTallyList" class="flex flex-col gap-2"></div>
+</div>
+</section>
+
+<!-- 누구에게 물어볼까요 -->
+<section class="mb-6">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-3 px-1">누구에게 물어볼까요</h2>
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)]">
+<div id="participantList" class="flex flex-col gap-2 mb-3"></div>
+<div id="savedGuestsRow" class="hidden flex-wrap gap-2 mb-3"></div>
+<div class="flex gap-2">
+<input id="guestInput" type="text" placeholder="손님 이름 (예: 이모 김지연)" class="flex-1 min-w-0 border border-outline-variant rounded-lg px-3 py-2.5 font-body-md text-body-md text-on-surface bg-surface-container-lowest" onkeydown="if(event.key==='Enter'){event.preventDefault();addGuestFromInput();}">
+<button type="button" class="px-4 rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-label-sm" onclick="addGuestFromInput()">+ 손님</button>
+</div>
+</div>
+</section>
+
+</main>
+
+<!-- Bottom Action -->
+<div class="fixed bottom-0 left-0 right-0 bg-surface/90 backdrop-blur-md border-t border-outline-variant" style="padding-bottom: env(safe-area-inset-bottom);">
+<div class="max-w-[600px] mx-auto px-safe-area-inset py-3">
+<button id="submitBtn" class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-[0.98] transition-transform" onclick="createMeal()">식사 만들기</button>
+</div>
+</div>
+
+<script>
+    var toastTimer;
+    function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.remove('opacity-0');
+        toast.classList.add('opacity-100');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('opacity-100'); toast.classList.add('opacity-0'); }, 2600);
+    }
+
+    var AVATAR_COLORS = ['#8a9a7b', '#9b8ab5', '#c98a5a', '#5f8fa3', '#b57a7a', '#a3945f'];
+    var menus = [];
+    var participants = [];
+    var mealType = 'home';
+    var colorIndex = 0;
+
+    function nextColor() { var c = AVATAR_COLORS[colorIndex % AVATAR_COLORS.length]; colorIndex++; return c; }
+    function initials(name) { return (name || '?').trim().charAt(0) || '?'; }
+
+    var DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+    var repeatDays = [];
+
+    function toggleRepeatDays() {
+        var on = document.getElementById('repeatToggle').checked;
+        document.getElementById('repeatDaysRow').classList.toggle('hidden', !on);
+        if (on && !repeatDays.length) {
+            var dateVal = document.getElementById('mealDate').value;
+            var d = dateVal ? new Date(dateVal + 'T00:00:00').getDay() : new Date().getDay();
+            repeatDays = [d];
+        }
+        renderRepeatDays();
+    }
+
+    function toggleRepeatDay(day) {
+        var idx = repeatDays.indexOf(day);
+        if (idx === -1) repeatDays.push(day); else repeatDays.splice(idx, 1);
+        renderRepeatDays();
+    }
+
+    function renderRepeatDays() {
+        var row = document.getElementById('repeatDaysRow');
+        row.innerHTML = '';
+        DAY_LABELS.forEach(function (label, day) {
+            var active = repeatDays.indexOf(day) !== -1;
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'w-9 h-9 rounded-full font-label-sm text-label-sm ' + (active ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant');
+            btn.textContent = label;
+            btn.onclick = function () { toggleRepeatDay(day); };
+            row.appendChild(btn);
+        });
+    }
+
+    function loadRecurringRules() {
+        var rules = [];
+        try { rules = JSON.parse(localStorage.getItem('recurring_meals') || '[]'); } catch (err) {}
+        return rules;
+    }
+
+    function renderActiveRules() {
+        var rules = loadRecurringRules();
+        var wrap = document.getElementById('activeRulesWrap');
+        var list = document.getElementById('activeRulesList');
+        list.innerHTML = '';
+        if (!rules.length) { wrap.classList.add('hidden'); return; }
+        wrap.classList.remove('hidden');
+        rules.forEach(function (rule) {
+            var dayText = rule.days.map(function (d) { return DAY_LABELS[d]; }).join('·');
+            var row = document.createElement('div');
+            row.className = 'flex items-center gap-2 bg-surface-container rounded-lg px-3 py-2';
+            row.innerHTML = '<span class="font-label-sm text-label-sm text-on-surface flex-1">매주 ' + dayText + '요일 ' + (rule.time || '시간 미정') + ' · ' + (rule.menus.join(' · ') || '메뉴 미정') + '</span>';
+            var delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.className = 'font-label-sm text-label-sm text-error';
+            delBtn.textContent = '삭제';
+            delBtn.onclick = function () { deleteRule(rule.id); };
+            row.appendChild(delBtn);
+            list.appendChild(row);
+        });
+    }
+
+    // 뭐 먹을지 고민될 때, 정하는 대신 가족에게 골라달라고 물어보기(3-0 홈에서 투표).
+    function startMenuPoll() {
+        if (menus.length < 2) { showToast('후보 메뉴를 2개 이상 넣어주세요'); return; }
+        var poll = { options: menus.map(function (m) { return m.name; }), votes: {} };
+        try { localStorage.setItem('menu_poll', JSON.stringify(poll)); } catch (err) {}
+        menus = [];
+        renderMenus();
+        renderActivePoll();
+        showToast('가족에게 물어봤어요 · 홈에서 고를 수 있어요');
+    }
+
+    function cancelMenuPoll() {
+        try { localStorage.removeItem('menu_poll'); } catch (err) {}
+        renderActivePoll();
+    }
+
+    function finalizePoll(name) {
+        addMenu(name);
+        try { localStorage.removeItem('menu_poll'); } catch (err) {}
+        renderActivePoll();
+        showToast(name + '(으)로 정했어요');
+    }
+
+    function renderActivePoll() {
+        var poll = null;
+        try { poll = JSON.parse(localStorage.getItem('menu_poll') || 'null'); } catch (err) {}
+        var wrap = document.getElementById('activePollWrap');
+        if (!poll) { wrap.classList.add('hidden'); return; }
+        wrap.classList.remove('hidden');
+
+        var list = document.getElementById('pollTallyList');
+        list.innerHTML = '';
+        var voteValues = Object.keys(poll.votes || {}).map(function (voter) { return poll.votes[voter]; });
+        poll.options.forEach(function (name) {
+            var count = voteValues.filter(function (v) { return v === name; }).length;
+            var row = document.createElement('div');
+            row.className = 'flex items-center gap-2 bg-surface-container rounded-lg px-3 py-2';
+            row.innerHTML = '<span class="font-body-md text-body-md text-on-surface flex-1">' + name + '</span>' +
+                '<span class="font-label-sm text-label-sm text-on-surface-variant">' + count + '표</span>';
+            var pickBtn = document.createElement('button');
+            pickBtn.type = 'button';
+            pickBtn.className = 'font-label-sm text-label-sm text-primary';
+            pickBtn.textContent = '확정하기';
+            pickBtn.onclick = function () { finalizePoll(name); };
+            row.appendChild(pickBtn);
+            list.appendChild(row);
+        });
+    }
+
+    function deleteRule(id) {
+        var rules = loadRecurringRules().filter(function (r) { return r.id !== id; });
+        try { localStorage.setItem('recurring_meals', JSON.stringify(rules)); } catch (err) {}
+        renderActiveRules();
+        showToast('반복 일정을 삭제했어요');
+    }
+
+    // 가족이 3-0(홈)에서 미리 답해둔 것 — 묻기 전에 이미 답을 알 수 있게.
+    function loadAdvanceAnswers() {
+        var answers = [];
+        try { answers = JSON.parse(localStorage.getItem('advance_answers') || '[]'); } catch (err) {}
+        return answers;
+    }
+
+    function onDateChanged() {
+        if (document.getElementById('repeatToggle').checked && repeatDays.length === 1) {
+            var dateVal = document.getElementById('mealDate').value;
+            if (dateVal) repeatDays = [new Date(dateVal + 'T00:00:00').getDay()];
+            renderRepeatDays();
+        }
+        applyAdvanceAnswers();
+        renderParticipants();
+    }
+
+    // 이 날짜에 "미리 안 먹어요"라고 답해둔 사람은 물어볼 목록에서 자동으로 체크 해제.
+    function applyAdvanceAnswers() {
+        var mealDate = document.getElementById('mealDate').value;
+        if (!mealDate) return;
+        var advance = loadAdvanceAnswers().filter(function (a) { return a.date === mealDate; });
+
+        // 이 날짜에 대한 "예외" 답이 없으면 요일별 기본 응답(5-4)으로 대체 — 두 기능이 따로 놀지 않게.
+        var weekdayDefaults = [];
+        try { weekdayDefaults = JSON.parse(localStorage.getItem('weekday_defaults') || '[]'); } catch (err) {}
+        var jsDay = new Date(mealDate + 'T00:00:00').getDay();
+        var weekdayIdx = (jsDay + 6) % 7; // 0=월 ... 6=일, 5-4의 DAYS 순서와 동일
+
+        participants.forEach(function (p) {
+            var exact = advance.find(function (a) { return p.name.indexOf(a.name) !== -1; });
+            if (exact) { p.checked = exact.status === 'attending'; return; }
+            var wd = weekdayDefaults.find(function (m) { return p.name.indexOf(m.name) !== -1; });
+            var state = wd && wd.defaults && wd.defaults[weekdayIdx];
+            if (state && state !== 'unset') { p.checked = state === 'on'; }
+        });
+    }
+
+    function toggleTimeInput() {
+        var undecided = document.getElementById('timeUndecided').checked;
+        var timeInput = document.getElementById('mealTime');
+        timeInput.disabled = undecided;
+        timeInput.classList.toggle('opacity-40', undecided);
+    }
+
+    function addMenu(name) {
+        if (!name) return;
+        menus.push({ id: 'menu' + Date.now() + Math.random().toString(36).slice(2, 5), name: name });
+        renderMenus();
+    }
+    function addMenuFromInput() {
+        var input = document.getElementById('menuInput');
+        var value = input.value.trim();
+        if (!value) return;
+        addMenu(value);
+        input.value = '';
+    }
+    function removeMenu(id) { menus = menus.filter(function (m) { return m.id !== id; }); renderMenus(); }
+
+    // 드래그 재정렬은 터치 화면에서 잘 안 먹으니, 탭 한 번으로 대표를 바꾸는 버튼을 기본 수단으로 둠.
+    function makeRepresentative(id) {
+        var index = menus.findIndex(function (m) { return m.id === id; });
+        if (index <= 0) return;
+        var moved = menus.splice(index, 1)[0];
+        menus.unshift(moved);
+        renderMenus();
+        showToast(moved.name + '(을)를 대표 메뉴로 정했어요');
+    }
+
+    var dragSrcIndex = null;
+    function renderMenus() {
+        var list = document.getElementById('menuList');
+        list.innerHTML = '';
+        menus.forEach(function (menu, index) {
+            var row = document.createElement('div');
+            row.className = 'menu-tag flex items-center gap-2 bg-surface-container rounded-lg px-3 py-2';
+            row.draggable = true;
+            row.addEventListener('dragstart', function () { dragSrcIndex = index; row.classList.add('dragging'); });
+            row.addEventListener('dragend', function () { row.classList.remove('dragging'); });
+            row.addEventListener('dragover', function (e) { e.preventDefault(); });
+            row.addEventListener('drop', function (e) {
+                e.preventDefault();
+                if (dragSrcIndex === null || dragSrcIndex === index) return;
+                var moved = menus.splice(dragSrcIndex, 1)[0];
+                menus.splice(index, 0, moved);
+                dragSrcIndex = null;
+                renderMenus();
+            });
+
+            var handle = document.createElement('span');
+            handle.className = 'material-symbols-outlined text-outline text-[18px]';
+            handle.textContent = 'drag_indicator';
+            row.appendChild(handle);
+
+            if (index === 0) {
+                var badge = document.createElement('span');
+                badge.className = 'font-label-sm text-label-sm bg-tertiary-container text-on-tertiary-container px-2 py-0.5 rounded-full shrink-0';
+                badge.textContent = '대표';
+                row.appendChild(badge);
+            }
+
+            var nameEl = document.createElement('span');
+            nameEl.className = 'font-body-md text-body-md text-on-surface flex-1';
+            nameEl.textContent = menu.name;
+            row.appendChild(nameEl);
+
+            if (index !== 0) {
+                var makeRepBtn = document.createElement('button');
+                makeRepBtn.type = 'button';
+                makeRepBtn.className = 'font-label-sm text-label-sm text-primary shrink-0';
+                makeRepBtn.textContent = '대표로';
+                makeRepBtn.onclick = function () { makeRepresentative(menu.id); };
+                row.appendChild(makeRepBtn);
+            }
+
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'w-6 h-6 flex items-center justify-center text-on-surface-variant shrink-0';
+            removeBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">close</span>';
+            removeBtn.onclick = function () { removeMenu(menu.id); };
+            row.appendChild(removeBtn);
+
+            list.appendChild(row);
+        });
+    }
+
+    var MENU_PLACEHOLDER = {
+        home: '메뉴를 입력하세요 (예: 김치찌개)',
+        eatout: '식당 · 메뉴를 입력하세요 (예: OO파스타집)',
+        delivery: '메뉴를 입력하세요 (예: 후라이드 치킨)'
+    };
+
+    function selectMealType(type) {
+        mealType = type;
+        document.querySelectorAll('.meal-type-chip').forEach(function (chip) {
+            var active = chip.getAttribute('data-type') === type;
+            chip.classList.toggle('bg-primary', active);
+            chip.classList.toggle('text-on-primary', active);
+            chip.classList.toggle('bg-surface-container-lowest', !active);
+            chip.classList.toggle('text-on-surface-variant', !active);
+            chip.classList.toggle('shadow-[0px_4px_12px_rgba(120,119,119,0.08)]', true);
+        });
+
+        document.getElementById('homeOnlyMenuTools').classList.toggle('hidden', type !== 'home');
+        document.getElementById('eatoutMenuTools').classList.toggle('hidden', type === 'home');
+        document.getElementById('menuInput').placeholder = MENU_PLACEHOLDER[type] || MENU_PLACEHOLDER.home;
+        if (type !== 'home') { renderFrequentPlaces(); renderRecommendedPlaces(); }
+    }
+
+    // 외식·배달일 땐 자주 가는 곳/추천 장소를 바로 고를 수 있게 — 집밥의 "저장된 메뉴" 패턴과 동일.
+    var RECOMMENDED_PLACES = ['우리동네 김밥천국', '정든 순대국', '새로 생긴 딤섬집', '단골 치킨집'];
+
+    function loadFrequentPlaces() {
+        var places = [];
+        try { places = JSON.parse(localStorage.getItem('saved_places') || '[]'); } catch (err) {}
+        return places;
+    }
+
+    function saveFrequentPlace(name) {
+        var places = loadFrequentPlaces();
+        if (places.indexOf(name) === -1) {
+            places.unshift(name);
+            try { localStorage.setItem('saved_places', JSON.stringify(places.slice(0, 8))); } catch (err) {}
+        }
+    }
+
+    function renderFrequentPlaces() {
+        var row = document.getElementById('frequentPlacesRow');
+        var places = loadFrequentPlaces();
+        row.innerHTML = '';
+        if (!places.length) {
+            var empty = document.createElement('p');
+            empty.className = 'font-label-sm text-label-sm text-on-surface-variant';
+            empty.textContent = '아직 없어요 · 식당을 넣고 만들면 다음부터 여기 나와요';
+            row.appendChild(empty);
+            return;
+        }
+        places.forEach(function (name) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm';
+            btn.textContent = name;
+            btn.onclick = function () { addMenu(name); };
+            row.appendChild(btn);
+        });
+    }
+
+    function renderRecommendedPlaces() {
+        var row = document.getElementById('recommendedPlacesRow');
+        row.innerHTML = '';
+        RECOMMENDED_PLACES.forEach(function (name) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'px-3 py-1.5 rounded-full bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm';
+            btn.textContent = name;
+            btn.onclick = function () { addMenu(name); };
+            row.appendChild(btn);
+        });
+    }
+
+    function addParticipant(name, color, checked, removable) {
+        participants.push({
+            id: 'p' + Date.now() + Math.random().toString(36).slice(2, 5),
+            name: name,
+            color: color || nextColor(),
+            checked: checked !== false,
+            removable: !!removable
+        });
+        renderParticipants();
+    }
+    function toggleParticipant(id) {
+        var p = participants.find(function (x) { return x.id === id; });
+        if (p) p.checked = !p.checked;
+        renderParticipants();
+    }
+    function removeParticipant(id) { participants = participants.filter(function (p) { return p.id !== id; }); renderParticipants(); }
+    function addGuestFromInput() {
+        var input = document.getElementById('guestInput');
+        var value = input.value.trim();
+        if (!value) return;
+        addParticipant(value, null, true, true);
+        input.value = '';
+    }
+
+    function addSavedGuest(name, btn) {
+        addParticipant(name, null, true, true);
+        btn.remove();
+    }
+
+    function renderSavedGuests() {
+        var guests = [];
+        try { guests = JSON.parse(localStorage.getItem('saved_guests') || '[]'); } catch (err) {}
+        var row = document.getElementById('savedGuestsRow');
+        if (!guests.length) { row.classList.add('hidden'); return; }
+        row.classList.remove('hidden');
+        row.classList.add('flex');
+        row.innerHTML = '';
+        var label = document.createElement('span');
+        label.className = 'w-full font-label-sm text-label-sm text-on-surface-variant';
+        label.textContent = '저장된 손님에서 선택';
+        row.appendChild(label);
+        guests.forEach(function (g) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm';
+            btn.textContent = g.name;
+            btn.onclick = function () { addSavedGuest(g.name, btn); };
+            row.appendChild(btn);
+        });
+    }
+
+    function renderParticipants() {
+        var list = document.getElementById('participantList');
+        list.innerHTML = '';
+        var mealDate = document.getElementById('mealDate').value;
+        var advance = mealDate ? loadAdvanceAnswers().filter(function (a) { return a.date === mealDate; }) : [];
+
+        participants.forEach(function (p) {
+            var row = document.createElement('div');
+            row.className = 'flex items-center gap-2.5';
+
+            var avatar = document.createElement('span');
+            avatar.className = 'w-7 h-7 rounded-full flex items-center justify-center text-on-primary font-label-sm text-label-sm shrink-0';
+            avatar.style.backgroundColor = p.color;
+            avatar.textContent = initials(p.name);
+            row.appendChild(avatar);
+
+            var nameWrap = document.createElement('span');
+            nameWrap.className = 'flex-1 flex flex-col';
+            var nameEl = document.createElement('span');
+            nameEl.className = 'font-body-md text-body-md text-on-surface';
+            nameEl.textContent = p.name;
+            nameWrap.appendChild(nameEl);
+
+            var pre = advance.find(function (a) { return p.name.indexOf(a.name) !== -1; });
+            if (pre) {
+                var preEl = document.createElement('span');
+                preEl.className = 'font-label-sm text-label-sm ' + (pre.status === 'attending' ? 'text-primary' : 'text-on-surface-variant');
+                preEl.textContent = pre.status === 'attending' ? '✓ 미리 먹는다고 했어요' : '✓ 미리 안 먹는다고 했어요 · 안 물어봐도 돼요';
+                nameWrap.appendChild(preEl);
+            }
+            row.appendChild(nameWrap);
+
+            var checkBtn = document.createElement('button');
+            checkBtn.type = 'button';
+            checkBtn.className = 'w-6 h-6 rounded-full border flex items-center justify-center shrink-0 ' + (p.checked ? 'bg-primary border-primary' : 'border-outline-variant');
+            checkBtn.innerHTML = p.checked ? '<span class="material-symbols-outlined text-[16px] text-on-primary">check</span>' : '';
+            checkBtn.onclick = function () { toggleParticipant(p.id); };
+            row.appendChild(checkBtn);
+
+            if (p.removable) {
+                var removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'w-6 h-6 flex items-center justify-center text-on-surface-variant shrink-0';
+                removeBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">close</span>';
+                removeBtn.onclick = function () { removeParticipant(p.id); };
+                row.appendChild(removeBtn);
+            }
+
+            list.appendChild(row);
+        });
+    }
+
+    function createMeal() {
+        var date = document.getElementById('mealDate').value;
+        if (!date) { showToast('식사 날짜를 선택해주세요.'); return; }
+        var attending = participants.filter(function (p) { return p.checked; });
+        if (attending.length === 0) { showToast('최소 1명 이상 물어볼 사람을 선택해주세요.'); return; }
+
+        if (mealType !== 'home') { menus.forEach(function (m) { saveFrequentPlace(m.name); }); }
+
+        var meal = {
+            id: isEditMode ? editMealId : Date.now(),
+            date: date,
+            time: document.getElementById('timeUndecided').checked ? null : document.getElementById('mealTime').value,
+            menus: menus.map(function (m) { return m.name; }),
+            mealType: mealType,
+            participants: attending.map(function (p) { return p.name; })
+        };
+
+        var created = [];
+        try { created = JSON.parse(localStorage.getItem('created_meals') || '[]'); } catch (e2) {}
+
+        if (isEditMode) {
+            created = created.map(function (m) { return m.id === editMealId ? meal : m; });
+            try {
+                localStorage.setItem('created_meals', JSON.stringify(created));
+                localStorage.removeItem('edit_meal');
+                localStorage.setItem('meal_edit_saved', '1');
+            } catch (err) {}
+            window.location.href = '../3-1. 내 식탁/code.html';
+            return;
+        }
+
+        try {
+            localStorage.setItem('draft_meal', JSON.stringify(meal));
+            created.push(meal);
+            localStorage.setItem('created_meals', JSON.stringify(created));
+        } catch (err) {}
+
+        if (document.getElementById('repeatToggle').checked && repeatDays.length) {
+            var rules = loadRecurringRules();
+            rules.push({
+                id: 'rule' + Date.now(),
+                days: repeatDays.slice(),
+                time: meal.time,
+                mealType: mealType,
+                menus: meal.menus,
+                participants: meal.participants
+            });
+            try { localStorage.setItem('recurring_meals', JSON.stringify(rules)); } catch (err) {}
+        }
+
+        window.location.href = '../3-8. 참여자 링크 공유/code.html';
+    }
+
+    var isEditMode = false;
+    var editMealId = null;
+
+    (function init() {
+        renderSavedGuests();
+
+        var params = new URLSearchParams(window.location.search);
+        var editMeal = null;
+        if (params.get('edit') === '1') {
+            try { editMeal = JSON.parse(localStorage.getItem('edit_meal') || 'null'); } catch (err) {}
+        }
+
+        if (editMeal) {
+            isEditMode = true;
+            editMealId = editMeal.id;
+            document.getElementById('pageTitle').textContent = '식사 수정하기';
+            document.getElementById('submitBtn').textContent = '수정 완료';
+            document.getElementById('editNotice').classList.remove('hidden');
+
+            document.getElementById('mealDate').value = editMeal.date || '';
+            if (editMeal.time) { document.getElementById('mealTime').value = editMeal.time; }
+            else { document.getElementById('timeUndecided').checked = true; toggleTimeInput(); }
+            selectMealType(editMeal.mealType || 'home');
+            (editMeal.menus || []).forEach(function (name) { addMenu(name); });
+            (editMeal.participants || []).forEach(function (name) { addParticipant(name, null, true, true); });
+            return;
+        }
+
+        selectMealType('home');
+        renderActiveRules();
+        renderActivePoll();
+
+        var todayStr = new Date().toISOString().slice(0, 10);
+        document.getElementById('mealDate').value = todayStr;
+        repeatDays = [new Date().getDay()];
+
+        var reuse = null;
+        try { reuse = JSON.parse(localStorage.getItem('reuse_meal') || 'null'); localStorage.removeItem('reuse_meal'); } catch (err) {}
+
+        var recipePick = null;
+        try { recipePick = JSON.parse(localStorage.getItem('recipe_pick') || 'null'); localStorage.removeItem('recipe_pick'); } catch (err) {}
+
+        if (recipePick) {
+            addMenu(recipePick.name);
+        } else if (reuse && reuse.menus && reuse.menus.length) {
+            reuse.menus.forEach(function (name) { addMenu(name); });
+        } else {
+            addMenu('김치찌개');
+        }
+
+        var members = [];
+        try { members = JSON.parse(localStorage.getItem('onboarding_members') || '[]'); } catch (err) {}
+        if (members.length) {
+            members.forEach(function (m) { addParticipant(m.isMe ? (m.name || '나') + ' (나)' : m.name, m.color, true, false); });
+        } else {
+            addParticipant('김영희 (나)', AVATAR_COLORS[0], true, false);
+            addParticipant('박철수', AVATAR_COLORS[1], true, false);
+            addParticipant('이지은', AVATAR_COLORS[2], true, false);
+        }
+
+        applyAdvanceAnswers();
+        renderParticipants();
+    })();
+</script>
+</body></html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>우리집식당 - 묻지 않아도 아는 우리집 식탁</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&amp;family=Noto+Serif:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-background": "#1b1c1c", "on-surface": "#1b1c1c", "outline-variant": "#c6c6ca", "secondary-fixed": "#e3e2e3", "on-error-container": "#93000a", "secondary-fixed-dim": "#c7c6c7", "surface-container-high": "#eae7e7", "on-primary": "#ffffff", "inverse-primary": "#5d5e62", "primary-container": "#f5f5f9", "surface-container-highest": "#e4e2e2", "on-tertiary-container": "#766f66", "on-secondary-container": "#646465", "surface-variant": "#e4e2e2", "bg-lavender": "#E6E6FA", surface: "#fbf9f8", secondary: "#5e5e5f", "on-tertiary-fixed-variant": "#4b463e", error: "#ba1a1a", "surface-dim": "#dcd9d9", "tertiary-fixed-dim": "#cec5bb", "on-tertiary": "#ffffff", "surface-container": "#f0eded", "on-tertiary-fixed": "#1f1b15", "primary-fixed-dim": "#c6c6ca", background: "#fbf9f8", "tertiary-fixed": "#ebe1d6", "on-secondary-fixed-variant": "#464748", "inverse-on-surface": "#f3f0f0", primary: "#5d5e62", "primary-fixed": "#e2e2e6", "secondary-container": "#e3e2e3", "avatar-purple": "#BA68C8", "on-primary-container": "#6f7074", "error-container": "#ffdad6", "surface-tint": "#5d5e62", "on-secondary": "#ffffff", "bg-cream": "#FFFDD0", "avatar-green": "#81C784", "on-secondary-fixed": "#1b1c1d", "on-surface-variant": "#45474a", "surface-container-low": "#f6f3f3", "surface-bright": "#fbf9f8", "tertiary-container": "#fef4e9", "on-error": "#ffffff", "status-today-yellow": "#FFD54F", "accent-terracotta": "#CC7E61", tertiary: "#645d55", "on-primary-fixed-variant": "#45474a", "on-primary-fixed": "#1a1c1f", "surface-container-lowest": "#ffffff", "inverse-surface": "#303030", "status-action-blue": "#64B5F6", outline: "#76777b", "status-future-orange": "#FF8A65"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {"section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem"}, fontFamily: {"body-md": ["Plus Jakarta Sans"], "emotional-quote": ["Noto Serif"], "display-serif": ["Noto Serif"], "headline-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], headline: ["Noto Serif"], display: ["Noto Serif"], body: ["Plus Jakarta Sans"], label: ["Plus Jakarta Sans"]}, fontSize: {"body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}], "emotional-quote": ["18px", {lineHeight: "26px", fontWeight: "400"}], "display-serif": ["24px", {lineHeight: "32px", fontWeight: "700"}], "headline-lg": ["20px", {lineHeight: "28px", fontWeight: "600"}], "label-sm": ["13px", {lineHeight: "18px", letterSpacing: "0.02em", fontWeight: "500"}]}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .organic-blob {
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            animation: blobAnim 8s ease-in-out infinite alternate;
+        }
+        @keyframes blobAnim {
+            0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+            100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+        }
+    </style>
+  </head>
+<body class="bg-surface text-on-background font-body-md antialiased h-screen overflow-hidden flex justify-center items-center">
+<main class="w-full h-full max-w-[600px] bg-background relative flex flex-col overflow-y-auto">
+<!-- TopAppBar Context: Home/Hero -->
+<header class="fixed top-0 w-full z-50 bg-background/80 dark:bg-background/80 backdrop-blur-md flex justify-between items-center px-safe-area-inset h-16 max-w-[600px] mx-auto bg-background dark:bg-background">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" data-icon="restaurant">restaurant</span>
+<h1 class="font-display-serif text-display-serif text-on-background">우리집식당</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-on-background text-background hover:opacity-80 transition-opacity" onclick="openMenuPanel()" aria-label="메뉴 열기">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</header>
+
+<!-- Menu Drawer -->
+<div id="menu-backdrop" class="hidden fixed inset-0 bg-on-background/40 z-[60]" onclick="closeMenuPanel()"></div>
+<aside id="menu-panel" class="hidden fixed top-0 right-0 h-full w-[85%] max-w-[320px] bg-background z-[70] shadow-2xl overflow-y-auto">
+<div class="flex items-center justify-between px-6 h-16 border-b border-surface-container-high">
+<h2 class="font-headline-lg text-headline-lg text-on-background">메뉴</h2>
+<button class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors" onclick="closeMenuPanel()" aria-label="메뉴 닫기">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex flex-col p-4 gap-2">
+<details class="rounded-xl bg-surface-container-lowest px-4 py-3">
+<summary class="font-label-sm text-label-sm text-on-background cursor-pointer flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">restaurant</span>
+서비스 소개
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant mt-3">우리집식당은 가족·동거인이 식사마다 참여 여부와 도착 시간을 나누고, 준비 인원을 확정해 함께 먹는 일을 조금 더 가볍게 만드는 서비스예요.</p>
+</details>
+<details class="rounded-xl bg-surface-container-lowest px-4 py-3">
+<summary class="font-label-sm text-label-sm text-on-background cursor-pointer flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">help</span>
+자주 묻는 질문 · 문의하기
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant mt-3">이용 중 궁금한 점이나 불편한 점이 있으면 언제든 알려주세요.</p>
+<a class="inline-block mt-2 font-label-sm text-label-sm text-primary underline" href="mailto:support@ourhometable.example">support@ourhometable.example 로 문의하기</a>
+</details>
+<details class="rounded-xl bg-surface-container-lowest px-4 py-3">
+<summary class="font-label-sm text-label-sm text-on-background cursor-pointer flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">gavel</span>
+이용약관 및 개인정보처리방침
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant mt-3">서비스 이용약관과 개인정보처리방침 전문은 준비 중이에요. 곧 이 화면에서 바로 확인할 수 있도록 연결할게요.</p>
+</details>
+<details class="rounded-xl bg-surface-container-lowest px-4 py-3">
+<summary class="font-label-sm text-label-sm text-on-background cursor-pointer flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">payments</span>
+다음 단계 로드맵 (준비 중)
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant mt-3">지금은 함께 먹을지 정하고 준비 인원을 확정하는 것까지만 도와드려요. 아래는 앞으로 차례로 준비할 것들이에요.</p>
+<ul class="mt-3 flex flex-col gap-2">
+<li class="font-label-sm text-label-sm text-on-surface-variant flex items-start gap-2"><span class="font-medium text-on-background shrink-0">식사별 금액·월 식비 예산</span></li>
+<li class="font-label-sm text-label-sm text-on-surface-variant flex items-start gap-2"><span class="font-medium text-on-background shrink-0">공동 결제·분담·정산</span></li>
+<li class="font-label-sm text-label-sm text-on-surface-variant flex items-start gap-2"><span class="font-medium text-on-background shrink-0">음식 사진 기록</span></li>
+<li class="font-label-sm text-label-sm text-on-surface-variant flex items-start gap-2"><span class="font-medium text-on-background shrink-0">소비 패턴 기반 밀키트 배송일 제안</span></li>
+</ul>
+</details>
+</div>
+</aside>
+<!-- Hero Content Section -->
+<section class="flex-1 mt-16 px-6 py-6 flex flex-col items-center justify-center text-center relative z-10 min-h-0">
+<!-- Organic Visual Element -->
+<div class="relative w-48 h-48 mb-5 flex justify-center items-center shrink-0">
+<!-- Background Blob 1 -->
+<div class="absolute inset-0 bg-status-today-yellow opacity-40 organic-blob transform -translate-x-4 translate-y-4 scale-105"></div>
+<!-- Background Blob 2 -->
+<div class="absolute inset-0 bg-primary opacity-20 organic-blob transform translate-x-4 -translate-y-2 scale-95" style="animation-delay: -2s;"></div>
+<!-- Main Foreground Blob / Image Container -->
+<div class="relative w-40 h-40 bg-surface-container-lowest organic-blob overflow-hidden shadow-[0px_8px_24px_rgba(100,100,150,0.12)] flex items-center justify-center">
+<div class="bg-cover bg-center w-full h-full" data-alt="A warm, inviting oil-pastel style illustration of a steaming bowl of rice on a beautifully set dining table. Soft, minimal background with pastel tones. The mood is comforting, homey, and serene, fitting a light-mode modern UI aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBGvSeucYIv7NCpvc2I4nflmfMqC4ag0SEZs_F4xiTmiqD5tHSC2_JvSrJeS9D9gj0apZ1duA13tu48K3En2mGPJiPcs84EZZKa0EYwikeINxd6lO0TJRaiXR58eNlEyYkvyB8TxyM6hnphdXYMka2ZC7gUK6VJMDEYnWFVgNtgUc5f9Ofv1u1Zqh5r1lbpl2pzQrI2CnAKGUg6lenXmJDrf1uQO2fEYjQkiw4vbWOyjMN4X1BLSeOZ')"></div>
+</div>
+</div>
+<!-- Typography -->
+<h2 class="font-display-serif text-[26px] leading-[32px] font-bold text-on-background mb-3 whitespace-pre-line tracking-tight shrink-0">“오늘 밥 먹어?”
+    이제 매번 묻지 마세요.</h2>
+<p class="font-body-md text-on-surface-variant mb-6 max-w-[80%] mx-auto shrink-0">
+                묻지 않아도 아는 우리집 식탁
+            </p>
+<!-- CTA Button -->
+<button class="bg-on-background text-background font-label-sm text-[15px] px-8 py-4 rounded-full flex items-center gap-3 hover:bg-secondary transition-colors shadow-md transform hover:scale-[1.02] active:scale-95 transition-transform duration-200 shrink-0" onclick="window.location.href='../2-2. 로그인/code.html'">
+                식당열기
+                <span class="w-6 h-6 rounded-full bg-status-today-yellow flex items-center justify-center text-on-background">
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</span>
+</button>
+</section>
+</main>
+<script>
+    (function checkAutoLogin() {
+        try {
+            if (localStorage.getItem('uc_logged_in') === 'true') {
+                var onboarded = localStorage.getItem('onboarding_completed') === 'true';
+                window.location.href = onboarded ? '../3-0. 홈/code.html' : '../1-2. 온보딩-시작하기/code.html';
+            }
+        } catch (err) {}
+    })();
+
+    function openMenuPanel() {
+        document.getElementById('menu-backdrop').classList.remove('hidden');
+        document.getElementById('menu-panel').classList.remove('hidden');
+    }
+
+    function closeMenuPanel() {
+        document.getElementById('menu-backdrop').classList.add('hidden');
+        document.getElementById('menu-panel').classList.add('hidden');
+    }
+</script>
+</body></html>

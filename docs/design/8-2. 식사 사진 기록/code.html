@@ -1,0 +1,94 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 식사 사진 기록</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "emotional-quote": ["Noto Serif"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "emotional-quote": ["19px", { "lineHeight": "28px", "fontWeight": "400" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+<main class="w-full max-w-[480px] flex flex-col px-safe-area-inset py-section-margin">
+
+<div id="formView">
+<header class="flex items-center gap-3 mb-6">
+<button class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-95 transition-transform" onclick="window.location.href='../3-1. 내 식탁/code.html'" aria-label="뒤로">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">사진 남기기</h1>
+</header>
+
+<label class="block w-full aspect-square rounded-xl bg-surface-container-lowest border border-dashed border-outline-variant flex flex-col items-center justify-center gap-2 cursor-pointer overflow-hidden mb-4" for="photoInput">
+<img id="photoPreview" class="hidden w-full h-full object-cover">
+<span id="photoPlaceholder" class="flex flex-col items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined" style="font-size:40px;">add_a_photo</span>
+<span class="font-label-sm text-label-sm">오늘 식탁 사진을 올려주세요</span>
+</span>
+</label>
+<input type="file" id="photoInput" accept="image/*" class="hidden" onchange="handlePhotoChange(event)">
+
+<input id="captionInput" type="text" placeholder="한 줄 메모 (선택, 예: 오랜만에 다같이)" class="w-full border border-outline-variant rounded-lg px-3 py-2.5 font-body-md text-body-md text-on-surface bg-surface-container-lowest mb-6">
+
+<button class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-[0.98] transition-transform mb-2" onclick="savePhoto()">저장하기</button>
+<button class="w-full py-2 font-label-sm text-label-sm text-on-surface-variant" onclick="window.location.href='../3-1. 내 식탁/code.html'">건너뛰기</button>
+</div>
+
+<div id="doneView" class="hidden text-center py-8">
+<span class="material-symbols-outlined text-primary mb-4" style="font-size:52px; font-variation-settings:'FILL' 1;">check_circle</span>
+<h1 class="font-emotional-quote text-emotional-quote text-on-surface mb-2">오늘의 식탁이 기록됐어요</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">식사 기록에서 다시 볼 수 있어요.</p>
+<button class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full active:scale-[0.98] transition-transform" onclick="window.location.href='../5-2. 식사 기록/code.html'">식사 기록 보기</button>
+</div>
+
+</main>
+
+<script>
+    var photoDataUrl = null;
+
+    function handlePhotoChange(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            photoDataUrl = e.target.result;
+            document.getElementById('photoPreview').src = photoDataUrl;
+            document.getElementById('photoPreview').classList.remove('hidden');
+            document.getElementById('photoPlaceholder').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function savePhoto() {
+        var caption = document.getElementById('captionInput').value.trim();
+        var params = new URLSearchParams(window.location.search);
+        var date = params.get('date') || '2024-08-16';
+
+        var photos = {};
+        try { photos = JSON.parse(localStorage.getItem('meal_photos') || '{}'); } catch (err) {}
+        photos[date] = { photo: photoDataUrl, caption: caption };
+        try { localStorage.setItem('meal_photos', JSON.stringify(photos)); } catch (err) {}
+
+        document.getElementById('formView').classList.add('hidden');
+        document.getElementById('doneView').classList.remove('hidden');
+    }
+</script>
+</body></html>

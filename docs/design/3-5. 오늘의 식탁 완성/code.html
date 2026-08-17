@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 오늘의 식탁 완성</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "tertiary-container": "#fef4e9", "on-tertiary-container": "#766f66", "tertiary": "#645d55",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "primary": "#5d5e62", "on-primary": "#ffffff",
+                      "surface-container-lowest": "#ffffff", "outline-variant": "#c6c6ca", "surface": "#fbf9f8"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "body-md": ["Plus Jakarta Sans"], "emotional-quote": ["Noto Serif"], "display-serif": ["Noto Serif"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "emotional-quote": ["19px", { "lineHeight": "28px", "fontWeight": "400" }],
+                      "display-serif": ["26px", { "lineHeight": "34px", "fontWeight": "700" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-tertiary-container text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center justify-center">
+<main class="w-full max-w-[420px] flex flex-col items-center px-6 py-section-margin text-center">
+
+<span class="material-symbols-outlined text-tertiary mb-4" style="font-size:52px; font-variation-settings:'FILL' 0;">soup_kitchen</span>
+
+<h1 class="font-display-serif text-display-serif text-on-surface mb-2">오늘의 식탁이<br>완성됐어요</h1>
+<p id="mealLine" class="font-emotional-quote text-emotional-quote text-on-tertiary-container mb-6">김치찌개 외 1개 · 19:00</p>
+
+<div class="bg-surface-container-lowest rounded-xl px-5 py-4 w-full text-left mb-8 shadow-[0px_4px_12px_rgba(120,119,119,0.08)]">
+<div id="summaryList" class="flex flex-col gap-2 font-body-md text-body-md text-on-surface"></div>
+</div>
+
+<button class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full active:scale-[0.98] transition-transform mb-2" onclick="window.location.href='../3-1. 내 식탁/code.html'">홈으로</button>
+<button class="w-full border border-outline-variant text-on-surface font-label-sm text-[15px] py-3.5 rounded-full active:scale-[0.98] transition-transform mb-2 flex items-center justify-center gap-2" onclick="window.location.href='../8-2. 식사 사진 기록/code.html'">
+<span class="material-symbols-outlined text-[18px]">add_a_photo</span>
+사진 남기기 (선택)
+</button>
+<button class="w-full py-2 font-label-sm text-label-sm text-on-tertiary-container" onclick="reopenMeal()">확정 취소하고 다시 열기</button>
+</main>
+
+<script>
+    function reopenMeal() {
+        if (!confirm('확정을 취소하고 응답을 다시 받을까요?')) return;
+        var data = null;
+        try { data = JSON.parse(localStorage.getItem('confirmed_meal') || 'null'); } catch (err) {}
+        if (data) {
+            var summary = {
+                title: (data.date || '오늘') + '의 식탁, 확정할까요?',
+                menu: data.menu,
+                attending: (data.attending || []).map(function (name) { return { name: name, note: '제시간' }; }),
+                late: data.late || [],
+                pending: (data.unconfirmed || []).map(function (name) { return { name: name, reason: '아직 확인 전' }; })
+            };
+            try { localStorage.setItem('meal_summary', JSON.stringify(summary)); } catch (err) {}
+        }
+        window.location.href = '../3-4. 확정 전 요약/code.html';
+    }
+</script>
+
+<script>
+    (function init() {
+        var data = null;
+        try { data = JSON.parse(localStorage.getItem('confirmed_meal') || 'null'); } catch (err) {}
+        if (!data) {
+            data = { menu: '김치찌개 외 1개', time: '19:00', finalCount: 2, late: [{ name: '박철수', note: '8시쯤 도착해요' }], unconfirmed: ['이지은'] };
+        }
+        document.getElementById('mealLine').textContent = data.menu + ' · ' + data.time;
+
+        var lines = ['함께 ' + data.finalCount + '명'];
+        (data.late || []).forEach(function (p) { lines.push(p.name + ' ' + p.note); });
+        (data.unconfirmed || []).forEach(function (name) { lines.push(name + ' 확인 안 됨'); });
+
+        var list = document.getElementById('summaryList');
+        lines.forEach(function (line) {
+            var row = document.createElement('div');
+            row.className = 'flex items-center gap-2';
+            row.innerHTML = '<span class="material-symbols-outlined text-[16px] text-on-surface-variant">check</span><span>' + line + '</span>';
+            list.appendChild(row);
+        });
+    })();
+</script>
+</body></html>

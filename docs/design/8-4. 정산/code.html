@@ -1,0 +1,113 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 정산</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff", "tertiary-container": "#fef4e9", "on-tertiary-container": "#766f66"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset py-section-margin">
+
+<header class="flex items-center gap-3 mb-6">
+<button class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-95 transition-transform" onclick="window.location.href='../5-2. 식사 기록/code.html'" aria-label="뒤로">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 id="pageTitle" class="font-headline-lg text-headline-lg text-on-surface">정산</h1>
+</header>
+
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center mb-4">이 가구 구성원끼리만 볼 수 있어요 · 실제 송금은 각자 알아서 해요</p>
+
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] mb-4">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">총 비용</p>
+<p id="totalCost" class="font-headline-lg text-headline-lg text-on-surface mb-3">0원</p>
+<div class="flex items-center gap-2 bg-surface-container rounded-lg px-3 py-2.5">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">groups</span>
+<p id="splitLine" class="font-label-sm text-label-sm text-on-surface-variant">균등 분담</p>
+</div>
+</div>
+
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-3 px-1">참여자별 정산</h2>
+<div id="settleList" class="flex flex-col gap-2 mb-4"></div>
+
+<p id="progressLine" class="font-label-sm text-label-sm text-on-surface-variant text-center"></p>
+
+</main>
+
+<script>
+    var IDENTITY_COLOR = { '김영희 (나)': '#8a9a7b', '박철수': '#9b8ab5', '이지은': '#c98a5a' };
+    var RECORD_DATA = {
+        '2024-08-16': { label: '8월 16일 (오늘)', participants: ['김영희 (나)', '박철수'] },
+        '2024-08-13': { label: '8월 13일 (화)', participants: ['김영희 (나)', '박철수', '이지은'] },
+        '2024-08-09': { label: '8월 9일 (금)', participants: ['김영희 (나)', '박철수'] },
+        '2024-08-03': { label: '8월 3일 (토)', participants: ['김영희 (나)', '박철수', '이지은'] }
+    };
+
+    function render() {
+        var params = new URLSearchParams(window.location.search);
+        var dateKey = params.get('date') || '2024-08-13';
+        var record = RECORD_DATA[dateKey] || RECORD_DATA['2024-08-13'];
+
+        var costs = {};
+        try { costs = JSON.parse(localStorage.getItem('meal_costs') || '{}'); } catch (err) {}
+        var totalCost = costs[dateKey] || 0;
+        var perPerson = record.participants.length ? Math.round(totalCost / record.participants.length) : 0;
+
+        document.getElementById('pageTitle').textContent = record.label + ' 정산';
+        document.getElementById('totalCost').textContent = totalCost.toLocaleString() + '원';
+        document.getElementById('splitLine').textContent = record.participants.length + '명이 ' + perPerson.toLocaleString() + '원씩 균등 분담';
+
+        var settlements = {};
+        try { settlements = JSON.parse(localStorage.getItem('settlements') || '{}'); } catch (err) {}
+        var settled = settlements[dateKey] || {};
+
+        var list = document.getElementById('settleList');
+        list.innerHTML = '';
+        record.participants.forEach(function (name) {
+            var isPaid = !!settled[name];
+            var row = document.createElement('div');
+            row.className = 'bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] flex items-center gap-3';
+            row.innerHTML =
+                '<span class="w-8 h-8 rounded-full flex items-center justify-center text-on-primary font-label-sm text-label-sm shrink-0" style="background-color:' + (IDENTITY_COLOR[name] || '#8a9a7b') + ';">' + name.charAt(0) + '</span>' +
+                '<span class="font-body-md text-body-md text-on-surface flex-1">' + name + '</span>' +
+                '<span class="font-label-sm text-label-sm text-on-surface-variant">' + perPerson.toLocaleString() + '원</span>' +
+                '<button type="button" class="toggle-btn font-label-sm text-label-sm px-3 py-1.5 rounded-full ' + (isPaid ? 'bg-tertiary-container text-on-tertiary-container' : 'bg-surface-container text-on-surface-variant') + '">' + (isPaid ? '정산 완료' : '미정산') + '</button>';
+            row.querySelector('.toggle-btn').onclick = function () { toggleSettled(dateKey, name); };
+            list.appendChild(row);
+        });
+
+        var paidCount = record.participants.filter(function (n) { return !!settled[n]; }).length;
+        document.getElementById('progressLine').textContent = paidCount + ' / ' + record.participants.length + '명 정산 완료';
+    }
+
+    function toggleSettled(dateKey, name) {
+        var settlements = {};
+        try { settlements = JSON.parse(localStorage.getItem('settlements') || '{}'); } catch (err) {}
+        if (!settlements[dateKey]) settlements[dateKey] = {};
+        settlements[dateKey][name] = !settlements[dateKey][name];
+        try { localStorage.setItem('settlements', JSON.stringify(settlements)); } catch (err) {}
+        render();
+    }
+
+    render();
+</script>
+</body></html>

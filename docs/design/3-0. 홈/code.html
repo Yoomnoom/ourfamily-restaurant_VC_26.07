@@ -1,0 +1,703 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 홈</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f6f3f3",
+                      "on-error-container": "#93000a",
+                      "on-secondary": "#ffffff",
+                      "surface-variant": "#e4e2e2",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#e3e2e3",
+                      "surface-container": "#f0eded",
+                      "on-secondary-fixed-variant": "#464748",
+                      "on-error": "#ffffff",
+                      "outline-variant": "#c6c6ca",
+                      "on-tertiary-fixed-variant": "#4b463e",
+                      "on-surface-variant": "#45474a",
+                      "tertiary-fixed-dim": "#cec5bb",
+                      "outline": "#76777b",
+                      "on-primary-container": "#6f7074",
+                      "on-secondary-fixed": "#1b1c1d",
+                      "error-container": "#ffdad6",
+                      "on-primary-fixed": "#1a1c1f",
+                      "inverse-surface": "#303030",
+                      "on-surface": "#1b1c1c",
+                      "secondary-fixed-dim": "#c7c6c7",
+                      "inverse-primary": "#5d5e62",
+                      "secondary-fixed": "#e3e2e3",
+                      "tertiary-fixed": "#ebe1d6",
+                      "error": "#ba1a1a",
+                      "inverse-on-surface": "#f3f0f0",
+                      "surface": "#fbf9f8",
+                      "on-tertiary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#eae7e7",
+                      "tertiary": "#645d55",
+                      "primary": "#5d5e62",
+                      "on-tertiary-container": "#766f66",
+                      "primary-fixed": "#e2e2e6",
+                      "tertiary-container": "#fef4e9",
+                      "primary-container": "#f5f5f9",
+                      "surface-dim": "#dcd9d9",
+                      "surface-container-highest": "#e4e2e2",
+                      "on-secondary-container": "#646465",
+                      "primary-fixed-dim": "#c6c6ca",
+                      "surface-tint": "#5d5e62",
+                      "background": "#fbf9f8",
+                      "secondary": "#5e5e5f",
+                      "on-primary-fixed-variant": "#45474a",
+                      "surface-bright": "#fbf9f8",
+                      "on-background": "#1b1c1c",
+                      "on-tertiary-fixed": "#1f1b15"
+              },
+              "spacing": {
+                      "section-margin": "2rem",
+                      "card-padding": "1.25rem",
+                      "safe-area-inset": "1rem",
+                      "stack-gap": "1rem"
+              },
+              "fontFamily": {
+                      "body-md": ["Plus Jakarta Sans"],
+                      "display-serif": ["Noto Serif"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "label-sm": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "display-serif": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+    body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }
+    .identity-line { border-left-width: 4px; border-left-style: solid; }
+    /* 아직 응답 안 한 좌석 = "자리에 못 앉고 서성이는" 느낌으로 살짝 흔들림. 응답하면(=착석) 멈춤. */
+    @keyframes seat-wander { 0%, 100% { transform: translate(-50%, -50%) rotate(-6deg); } 50% { transform: translate(-50%, -50%) rotate(6deg); } }
+    .seat-wander { animation: seat-wander 1.6s ease-in-out infinite; }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bg-on-surface text-surface font-label-sm text-label-sm px-4 py-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300" style="bottom:calc(84px + env(safe-area-inset-bottom)); z-index:100;"></div>
+
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset pt-section-margin pb-28 relative">
+
+<!-- Top App Bar -->
+<header class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1; font-size: 26px;">restaurant</span>
+<span class="font-display-serif text-display-serif text-on-surface">우리집식당</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="relative w-11 h-11 rounded-full bg-surface-container-lowest shadow-[0px_4px_12px_rgba(120,119,119,0.08)] flex items-center justify-center active:scale-95 transition-transform" onclick="openNotiPanel()" aria-label="알림">
+<span class="material-symbols-outlined text-on-surface">notifications</span>
+<span id="notiDot" class="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary"></span>
+</button>
+</div>
+</header>
+
+<!-- 앱의 정체성: "오늘 우리 식탁에 누가 앉는지"를 원형 식탁 + 가족 아바타 좌석 하나로 보여줌.
+     텍스트 카드로는 아무리 순서·굵기를 조정해도 "한눈에 꽂히는 단일 비주얼"이 안 된다는 지적 —
+     이름 그대로 "식탁"을 실제로 그려서 앱 정체성을 즉시 보여주는 게 핵심. -->
+<div class="mb-3">
+<h1 id="householdTitle" class="font-headline-lg text-headline-lg text-on-surface">우리집, 오늘 식탁</h1>
+</div>
+
+<a id="myTableLink" class="flex flex-col items-center mb-2" href="../3-1. 내 식탁/code.html">
+<div class="relative w-60 h-60 mb-3">
+<div class="absolute rounded-full bg-tertiary-container flex items-center justify-center text-center px-4" style="inset:15%;">
+<span id="tableHeroMenu" class="font-label-sm text-label-sm text-on-tertiary-container font-semibold leading-tight">-</span>
+</div>
+<div id="tableHeroSeats" class="absolute inset-0"></div>
+<!-- 방명록 말풍선: 좌석 위에 그날 남긴 한마디를 짧게 보여줌(싸이월드 방명록에서 착안) -->
+<div id="tableHeroBubbles" class="absolute inset-0"></div>
+</div>
+<div class="flex items-center gap-1">
+<span id="householdSubtitle" class="font-headline-lg text-headline-lg text-on-surface">-</span>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</a>
+
+<!-- 오늘 이 화면을 아직 안 본 사람 — 있을 때만 표시(호스트가 누구한테 더 알려야 할지 바로 앎) -->
+<p id="unseenLine" class="hidden font-label-sm text-label-sm text-on-surface-variant text-center mb-2"></p>
+
+<div id="myNoteRow" class="text-center mb-6"></div>
+
+<!-- 뭐 먹을지 정하는 사람이 고민될 때 보낸 투표: 있을 때만 표시 -->
+<section id="pollSection" class="hidden mb-6">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-3 px-1">오늘 뭐 먹을지 골라주세요</h2>
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)]">
+<div id="pollOptionsList" class="flex flex-col gap-2"></div>
+</div>
+</section>
+
+<!-- 가족이 먹고 싶어해요: 응답만 하는 게 아니라 먼저 말할 수 있는 자리. 역할 구분 없이 가족 누구나. -->
+<section class="mb-6">
+<div class="flex items-center justify-between mb-3 px-1">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide">가족이 먹고 싶어해요</h2>
+<button class="font-label-sm text-label-sm text-primary" onclick="addMenuRequest()">+ 나도 요청</button>
+</div>
+<div id="requestList" class="flex flex-col gap-2"></div>
+</section>
+
+<!-- 구분선: 여기부터는 자주 안 쓰는 부수 기능(살림·기록·설정 지름길) -->
+<div class="border-t border-outline-variant mb-6"></div>
+
+<!-- 큰 타일 2개: 하단 탭에 없는 것 중 가장 중요한 것(달력·냉장고는 이미 하단 탭에 있어서 여기 안 넣음 — 중복) -->
+<section class="mb-3">
+<div class="grid grid-cols-2 gap-3">
+<button class="rounded-2xl bg-tertiary-container p-4 text-left h-28 flex flex-col justify-between shadow-[0px_2px_8px_rgba(120,119,119,0.06)]" onclick="window.location.href='../8-1. 밀키트 주문/code.html'">
+<span class="material-symbols-outlined text-on-tertiary-container" style="font-size:28px;">local_shipping</span>
+<span class="font-body-md text-body-md text-on-tertiary-container font-medium">밀키트 주문</span>
+</button>
+<button class="rounded-2xl bg-secondary-container p-4 text-left h-28 flex flex-col justify-between shadow-[0px_2px_8px_rgba(120,119,119,0.06)]" onclick="window.location.href='../8-3. 식비 예산/code.html'">
+<span class="material-symbols-outlined text-on-secondary-container" style="font-size:28px;">payments</span>
+<span class="font-body-md text-body-md text-on-secondary-container font-medium">식비 예산</span>
+</button>
+</div>
+</section>
+
+<!-- 중간 타일 1개: 식사 기록(월 요약 통계 포함 — 어차피 "지난 식사 돌아보기"라 한 화면으로 합침) -->
+<section class="mb-3">
+<button class="w-full rounded-2xl bg-surface-container-lowest p-4 text-left flex items-center gap-3 shadow-[0px_2px_8px_rgba(120,119,119,0.06)]" onclick="window.location.href='../5-2. 식사 기록/code.html'">
+<span class="material-symbols-outlined text-primary" style="font-size:26px;">history</span>
+<span class="flex-1">
+<span class="block font-body-md text-body-md text-on-surface font-medium">식사 기록</span>
+<span class="block font-label-sm text-label-sm text-on-surface-variant">이번 달 통계도 여기서 함께 봐요</span>
+</span>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</button>
+</section>
+
+<!-- 작은 아이콘 줄: 가끔 쓰는 것 -->
+<section class="mb-6">
+<div class="bg-surface-container-lowest rounded-2xl px-2 py-4 shadow-[0px_2px_8px_rgba(120,119,119,0.06)] flex items-start justify-between">
+<button class="flex-1 flex flex-col items-center gap-1.5" onclick="window.location.href='../5-1. 가구 설정/code.html'">
+<span class="material-symbols-outlined text-primary">group</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-center">가구 설정</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-1.5" onclick="window.location.href='../5-4. 요일별 기본 응답/code.html'">
+<span class="material-symbols-outlined text-primary">event_repeat</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-center">요일별 응답</span>
+</button>
+</div>
+</section>
+
+</main>
+
+<!-- Floating Action Button -->
+<button class="fixed right-5 z-20 w-14 h-14 rounded-full bg-primary text-on-primary shadow-[0px_6px_16px_rgba(27,28,28,0.25)] flex items-center justify-center active:scale-95 transition-transform" style="bottom: calc(84px + env(safe-area-inset-bottom));" onclick="window.location.href='../3-2. 식사 만들기/code.html'" aria-label="식사 만들기">
+<span class="material-symbols-outlined" style="font-size:28px;">add</span>
+</button>
+
+<!-- Bottom Tab Nav -->
+<nav class="fixed bottom-0 left-0 right-0 z-10 bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant" style="padding-bottom: env(safe-area-inset-bottom);">
+<div class="max-w-[600px] mx-auto flex items-stretch">
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">홈</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../3-1. 내 식탁/code.html'">
+<span class="material-symbols-outlined">table_restaurant</span>
+<span class="font-label-sm text-label-sm">내 식탁</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../4-1. 홈 달력뷰/code.html'">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-label-sm">달력</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../7-1. 우리집 냉장고/code.html'">
+<span class="material-symbols-outlined">kitchen</span>
+<span class="font-label-sm text-label-sm">냉장고</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../5-3. 설정/code.html'">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm text-label-sm">설정</span>
+</button>
+</div>
+</nav>
+
+<!-- 알림 패널 (슬라이드인, 전체 이동 없이 확인·닫기) -->
+<div id="notiBackdrop" class="hidden fixed inset-0 bg-on-surface/30 z-[60]" onclick="closeNotiPanel()"></div>
+<aside id="notiPanel" class="hidden fixed top-0 right-0 h-full w-[88%] max-w-[360px] bg-surface z-[70] shadow-2xl overflow-y-auto" style="transform: translateX(100%); transition: transform .25s ease;">
+<div class="flex items-center justify-between px-5 py-4 border-b border-outline-variant">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">알림</h2>
+<button class="w-11 h-11 flex items-center justify-center rounded-full active:bg-surface-container transition-colors" onclick="closeNotiPanel()" aria-label="알림 닫기">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div id="notiList" class="flex flex-col gap-2 p-4"></div>
+</aside>
+
+<script>
+    var toastTimer;
+    function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.remove('opacity-0');
+        toast.classList.add('opacity-100');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('opacity-100'); toast.classList.add('opacity-0'); }, 2600);
+    }
+
+    var IDENTITY_COLOR = { '김영희': '#8a9a7b', '박철수': '#9b8ab5', '이지은': '#c98a5a', '김하준': '#5f8fa3' };
+
+    // 유형(type)별로 알림 패널 안에서 바로 확인·처리하게(전체 이동 없이) — 항목마다 눌렀을 때 반응이 다르면 안 됨(사용자 지적).
+    var NOTIS = [
+        { id: 'demo-response-change', icon: 'sync_alt', color: '#9b8ab5', title: '박철수님이 응답을 바꿨어요', body: '먹어요 → 안 먹어요', time: '조금 전', unread: true,
+          type: 'response_change', name: '박철수', from: '먹어요', to: '안 먹어요', expectedFrom: 2, expectedTo: 1 },
+        { id: 'demo-reminder', icon: 'schedule_send', color: '#8a9a7b', title: '이지은님이 아직 응답하지 않았어요', body: '오늘 저녁 식사 · 리마인드를 보내보세요', time: '1시간 전', unread: true,
+          type: 'reminder', name: '이지은', detailPath: '../3-4. 확정 전 요약/code.html' },
+        { id: 'demo-confirmed', icon: 'check_circle', color: '#8a9a7b', title: '오늘의 식탁이 확정됐어요', body: '준비 인원 2명', time: '어제', unread: false,
+          type: 'confirmed', count: 2, detailPath: '../3-5. 오늘의 식탁 완성/code.html' },
+        { id: 'demo-welcome', icon: 'celebration', color: '#c98a5a', title: '우리집식당에 오신 걸 환영해요!', body: '가구를 만들고 첫 식사를 열어보세요', time: '3일 전', unread: false,
+          type: 'welcome', detailPath: '../3-2. 식사 만들기/code.html' }
+    ];
+
+    var NOTI_PREVIEW_COUNT = 5; // 알림도 쌓이면 무한정 길어지지 않게 — 더보기로 펼침
+    var notiExpanded = false;
+
+    // 알림을 열어본 적이 있으면 다음부터는 안읽음으로 안 치게(읽음 처리를 실제로 저장) — id 없는 옛 데이터는 항상 안읽음으로 간주.
+    function loadReadIds() {
+        var ids = [];
+        try { ids = JSON.parse(localStorage.getItem('notification_reads') || '[]'); } catch (err) {}
+        return ids;
+    }
+    function markNotiRead(id) {
+        if (!id) return;
+        var ids = loadReadIds();
+        if (ids.indexOf(id) === -1) {
+            ids.push(id);
+            try { localStorage.setItem('notification_reads', JSON.stringify(ids)); } catch (err) {}
+        }
+        updateNotiDot();
+    }
+    function isUnread(n) {
+        return !!n.unread && (!n.id || loadReadIds().indexOf(n.id) === -1);
+    }
+
+    function updateNotiDot() {
+        var liveNotis = [];
+        try { liveNotis = JSON.parse(localStorage.getItem('notifications') || '[]'); } catch (err) {}
+        var hasUnread = liveNotis.concat(NOTIS).some(isUnread);
+        var dot = document.getElementById('notiDot');
+        if (dot) { dot.classList.toggle('hidden', !hasUnread); }
+    }
+
+    function renderNotiPanel() {
+        var liveNotis = [];
+        try { liveNotis = JSON.parse(localStorage.getItem('notifications') || '[]'); } catch (err) {}
+        var allNotis = liveNotis.concat(NOTIS);
+        var visibleNotis = notiExpanded ? allNotis : allNotis.slice(0, NOTI_PREVIEW_COUNT);
+
+        var list = document.getElementById('notiList');
+        list.innerHTML = '';
+        visibleNotis.forEach(function (n) {
+            var row = document.createElement('button');
+            row.className = 'text-left w-full bg-surface-container-lowest rounded-xl p-4 shadow-[0px_2px_8px_rgba(120,119,119,0.06)] flex items-start gap-3';
+            row.onclick = function () { showNotiDetail(n); };
+            row.innerHTML =
+                '<span class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style="background:' + n.color + '22; color:' + n.color + ';"><span class="material-symbols-outlined text-[20px]">' + n.icon + '</span></span>' +
+                '<div class="flex-1 min-w-0">' +
+                '<div class="flex items-center gap-2">' +
+                '<p class="font-body-md text-body-md text-on-surface font-medium">' + n.title + '</p>' +
+                (isUnread(n) ? '<span class="w-2 h-2 rounded-full bg-primary shrink-0"></span>' : '') +
+                '</div>' +
+                '<p class="font-label-sm text-label-sm text-on-surface-variant">' + n.body + '</p>' +
+                '<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">' + n.time + '</p>' +
+                '</div>';
+            list.appendChild(row);
+        });
+
+        if (!notiExpanded && allNotis.length > NOTI_PREVIEW_COUNT) {
+            var moreBtn = document.createElement('button');
+            moreBtn.type = 'button';
+            moreBtn.className = 'w-full text-center font-label-sm text-label-sm text-primary py-2';
+            moreBtn.textContent = '+ ' + (allNotis.length - NOTI_PREVIEW_COUNT) + '개 더보기';
+            moreBtn.onclick = function () { notiExpanded = true; renderNotiPanel(); };
+            list.appendChild(moreBtn);
+        }
+    }
+
+    function showNotiDetail(n) {
+        markNotiRead(n.id);
+        var list = document.getElementById('notiList');
+        var back = '<button id="notiBackBtn" class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant mb-1"><span class="material-symbols-outlined text-[18px]">arrow_back</span>목록으로</button>';
+        var body, actions;
+
+        if (n.type === 'response_change') {
+            var hasCount = n.expectedFrom !== undefined && n.expectedTo !== undefined;
+            body = '<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0px_2px_8px_rgba(120,119,119,0.06)]">' +
+                '<p class="font-body-md text-body-md text-on-surface mb-1"><b>' + n.name + '</b>님이 응답을 바꿨어요</p>' +
+                '<p class="font-label-sm text-label-sm text-on-surface-variant' + (hasCount ? ' mb-3' : '') + '">' + n.from + ' → ' + n.to + '</p>' +
+                (hasCount ?
+                    '<div class="bg-surface-container rounded-lg px-3 py-2.5">' +
+                    '<p class="font-label-sm text-label-sm text-on-surface-variant">예상 준비 <s class="opacity-60">' + n.expectedFrom + '명</s> → <b class="text-on-surface">' + n.expectedTo + '명</b>으로 바뀌었어요</p>' +
+                    '</div>' : '') +
+                '</div>';
+            actions = '<div class="flex gap-2 mt-3">' +
+                '<button id="notiAckBtn" class="flex-1 py-2.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm">확인했어요</button>' +
+                '<a href="tel:010-0000-0000" class="flex-1 py-2.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm text-center">' + n.name + '에게 전화</a>' +
+                '</div>';
+        } else if (n.type === 'reminder') {
+            body = '<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0px_2px_8px_rgba(120,119,119,0.06)]">' +
+                '<p class="font-body-md text-body-md text-on-surface mb-1"><b>' + n.name + '</b>님이 아직 응답하지 않았어요</p>' +
+                '<p class="font-label-sm text-label-sm text-on-surface-variant">오늘 저녁 식사 응답을 기다리고 있어요</p></div>';
+            actions = '<div class="flex gap-2 mt-3">' +
+                '<button id="notiRemindBtn" class="flex-1 py-2.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm">리마인드 보내기</button>' +
+                '<a href="' + n.detailPath + '" class="flex-1 py-2.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm text-center">자세히 보기</a>' +
+                '</div>';
+        } else if (n.type === 'confirmed') {
+            body = '<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0px_2px_8px_rgba(120,119,119,0.06)]">' +
+                '<p class="font-body-md text-body-md text-on-surface mb-1">오늘의 식탁이 확정됐어요</p>' +
+                '<p class="font-label-sm text-label-sm text-on-surface-variant">준비 인원 <b class="text-on-surface">' + n.count + '명</b></p></div>';
+            actions = '<div class="flex gap-2 mt-3">' +
+                '<button id="notiAckBtn" class="flex-1 py-2.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm">확인했어요</button>' +
+                '<a href="' + n.detailPath + '" class="flex-1 py-2.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm text-center">자세히 보기</a>' +
+                '</div>';
+        } else {
+            body = '<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0px_2px_8px_rgba(120,119,119,0.06)]">' +
+                '<p class="font-body-md text-body-md text-on-surface mb-1">우리집식당에 오신 걸 환영해요!</p>' +
+                '<p class="font-label-sm text-label-sm text-on-surface-variant">가구를 만들고 첫 식사를 열어보세요</p></div>';
+            actions = '<div class="flex gap-2 mt-3">' +
+                '<button id="notiAckBtn" class="flex-1 py-2.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm">확인했어요</button>' +
+                '<a href="' + n.detailPath + '" class="flex-1 py-2.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm text-center">식사 만들러 가기</a>' +
+                '</div>';
+        }
+
+        list.innerHTML = back + body + actions;
+        document.getElementById('notiBackBtn').onclick = renderNotiPanel;
+        var ackBtn = document.getElementById('notiAckBtn');
+        if (ackBtn) ackBtn.onclick = renderNotiPanel;
+        var remindBtn = document.getElementById('notiRemindBtn');
+        if (remindBtn) remindBtn.onclick = function () { renderNotiPanel(); showToast(n.name + '님에게 리마인드를 보냈어요'); };
+    }
+
+    function openNotiPanel() {
+        renderNotiPanel();
+        document.getElementById('notiBackdrop').classList.remove('hidden');
+        document.getElementById('notiPanel').classList.remove('hidden');
+        requestAnimationFrame(function () { document.getElementById('notiPanel').style.transform = 'translateX(0)'; });
+    }
+
+    function closeNotiPanel() {
+        document.getElementById('notiPanel').style.transform = 'translateX(100%)';
+        document.getElementById('notiBackdrop').classList.add('hidden');
+        setTimeout(function () { document.getElementById('notiPanel').classList.add('hidden'); }, 250);
+    }
+
+    // 참고문서 화면03+화면07 데이터를 그대로 재사용하되, 여기서는 역할별 액션 없이
+    // "누구나 보는" 요약 정보만(대표 메뉴·시간·참여 현황) 보여준다. 자세한 건 내 식탁에서.
+    var MEALS = [
+        {
+            when: '오늘', time: '19:00', creator: '김영희', menu: '김치찌개 외 1개',
+            roster: [
+                { name: '김영희', status: 'attending' }, { name: '박철수', status: 'attending' },
+                { name: '이지은', status: 'pending' }, { name: '김하준', status: 'pending' }
+            ]
+        },
+        {
+            when: '내일', time: '12:30', creator: '박철수', menu: '비빔국수 외 1개',
+            roster: [ { name: '박철수', status: 'attending' }, { name: '김영희', status: 'pending' } ]
+        },
+        { when: '내일', time: null, creator: '김영희', menu: null, roster: [] }
+    ];
+
+    // 3-2/4-1과 같은 형식(YYYY-MM-DD)으로 맞춰서 달력이 날짜만 보고 그날의 한마디를 찾을 수 있게.
+    function todayKey() {
+        var d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    // 방명록(싸이월드에서 착안): 지우지 않고 계속 쌓아서 달력에서 그날 것을 다시 볼 수 있게(가족 기록장).
+    function loadGuestbookNotes() {
+        var notes = [];
+        try { notes = JSON.parse(localStorage.getItem('guestbook_notes') || '[]'); } catch (err) {}
+        return notes;
+    }
+    function todaysNoteFor(name) {
+        var todays = loadGuestbookNotes().filter(function (n) { return n.name === name && n.day === todayKey(); });
+        return todays.length ? todays[todays.length - 1] : null;
+    }
+    function addGuestbookNote() {
+        var message = prompt('한마디 남길까요? (예: 오늘 좀 늦어요, 잘 먹었어요)');
+        if (!message || !message.trim()) return;
+        var notes = loadGuestbookNotes();
+        notes.push({ id: 'note' + Date.now() + Math.random().toString(36).slice(2, 6), name: CURRENT_PERSONA, message: message.trim(), day: todayKey() });
+        try { localStorage.setItem('guestbook_notes', JSON.stringify(notes)); } catch (err) {}
+        renderTableHero();
+        renderMyNoteRow();
+        showToast('한마디 남겼어요 · 달력에서 다시 볼 수 있어요');
+    }
+
+    function removeGuestbookNote(id) {
+        // 잘못 눌렀을 수도, 수정하려던 걸 수도 있으니 지우기 전에 한 번 확인.
+        if (!confirm('이 한마디를 지울까요? 되돌릴 수 없어요.')) return;
+        var notes = loadGuestbookNotes().filter(function (n) { return n.id !== id; });
+        try { localStorage.setItem('guestbook_notes', JSON.stringify(notes)); } catch (err) {}
+        renderTableHero();
+        renderMyNoteRow();
+        showToast('한마디를 지웠어요');
+    }
+
+    // 내가 오늘 남긴 한마디가 있으면 지우기 링크와 함께 보여주고, 없으면 남기기 버튼만.
+    function renderMyNoteRow() {
+        var row = document.getElementById('myNoteRow');
+        var mine = todaysNoteFor(CURRENT_PERSONA);
+        if (!mine) {
+            row.innerHTML = '<button type="button" class="font-label-sm text-label-sm text-primary" onclick="addGuestbookNote()">+ 한마디 남기기</button>';
+            return;
+        }
+        // 좌석 위 말풍선·달력의 그날 한마디와 같은 포스트잇 톤으로 통일 — 줄글로 뭉쳐 보이던 것을 카드로.
+        row.innerHTML =
+            '<div class="inline-block text-left px-3 py-2 rounded-sm" style="background:#fff6d6;border:1px solid #ecdc9c;box-shadow:2px 2px 4px rgba(120,119,119,0.15);">' +
+            '<div class="flex items-center justify-between gap-3 mb-0.5">' +
+            '<span class="font-label-sm text-label-sm font-semibold" style="color:#5c4a1a;">내 한마디</span>' +
+            '<button type="button" id="removeMyNoteBtn" class="font-label-sm text-label-sm" style="color:#8a7530;">×</button>' +
+            '</div>' +
+            '<p class="font-label-sm text-label-sm" style="color:#6b5a2a;">' + mine.message + '</p>' +
+            '</div>';
+        document.getElementById('removeMyNoteBtn').onclick = function () { removeGuestbookNote(mine.id); };
+    }
+
+    // 오늘 이 화면을 아직 안 본 사람(싸이월드 "오늘 방문자" 개념) — 호스트가 누구한테 더 알려야 할지 바로 알게.
+    function renderUnseenLine(names) {
+        var lastSeen = {};
+        try { lastSeen = JSON.parse(localStorage.getItem('last_seen') || '{}'); } catch (err) {}
+        var unseen = names.filter(function (name) { return name !== CURRENT_PERSONA && lastSeen[name] !== todayKey(); });
+        var line = document.getElementById('unseenLine');
+        if (!unseen.length) { line.classList.add('hidden'); return; }
+        line.classList.remove('hidden');
+        line.textContent = '아직 이 화면 못 본 사람: ' + unseen.join(', ');
+    }
+
+    var CURRENT_PERSONA = '김영희';
+    var REQUEST_PREVIEW_COUNT = 3; // 홈은 훑어보는 자리라 몇 개까지만 — 늘어나면 "+N개 더보기"로 펼침(전체 이동 없이)
+    var requestsExpanded = false;
+
+    function renderMenuRequests() {
+        var requests = null;
+        try { requests = JSON.parse(localStorage.getItem('menu_requests') || 'null'); } catch (err) {}
+        if (!requests) { requests = [{ name: '박철수', menu: '삼겹살' }, { name: '이지은', menu: '비빔국수' }]; }
+
+        var list = document.getElementById('requestList');
+        list.innerHTML = '';
+        if (!requests.length) {
+            var empty = document.createElement('p');
+            empty.className = 'font-label-sm text-label-sm text-on-surface-variant px-1';
+            empty.textContent = '아직 요청이 없어요';
+            list.appendChild(empty);
+            return;
+        }
+        var visible = requestsExpanded ? requests : requests.slice(0, REQUEST_PREVIEW_COUNT);
+        visible.forEach(function (r) {
+            var isMe = r.name === CURRENT_PERSONA;
+            var row = document.createElement('div');
+            row.className = 'flex items-center gap-3 bg-surface-container-lowest rounded-xl px-4 py-3 shadow-[0px_2px_8px_rgba(120,119,119,0.06)]';
+            row.innerHTML =
+                '<span class="w-8 h-8 rounded-full flex items-center justify-center text-on-primary font-label-sm text-label-sm shrink-0" style="background-color:' + (IDENTITY_COLOR[r.name] || '#8a9a7b') + ';">' + r.name.charAt(0) + '</span>' +
+                '<span class="font-body-md text-body-md text-on-surface flex-1">' + r.name + (isMe ? ' (나)' : '') + ' · ' + r.menu + '</span>' +
+                '<button type="button" class="use-request-btn font-label-sm text-label-sm text-primary shrink-0">이걸로 만들기 →</button>';
+            row.querySelector('.use-request-btn').onclick = function () {
+                try { localStorage.setItem('recipe_pick', JSON.stringify({ name: r.menu })); } catch (err) {}
+                window.location.href = '../3-2. 식사 만들기/code.html';
+            };
+            list.appendChild(row);
+        });
+
+        if (!requestsExpanded && requests.length > REQUEST_PREVIEW_COUNT) {
+            var moreBtn = document.createElement('button');
+            moreBtn.type = 'button';
+            moreBtn.className = 'w-full text-center font-label-sm text-label-sm text-primary py-1.5';
+            moreBtn.textContent = '+ ' + (requests.length - REQUEST_PREVIEW_COUNT) + '개 더보기';
+            moreBtn.onclick = function () { requestsExpanded = true; renderMenuRequests(); };
+            list.appendChild(moreBtn);
+        } else if (requestsExpanded && requests.length > REQUEST_PREVIEW_COUNT) {
+            var lessBtn = document.createElement('button');
+            lessBtn.type = 'button';
+            lessBtn.className = 'w-full text-center font-label-sm text-label-sm text-on-surface-variant py-1.5';
+            lessBtn.textContent = '접기';
+            lessBtn.onclick = function () { requestsExpanded = false; renderMenuRequests(); };
+            list.appendChild(lessBtn);
+        }
+    }
+
+    function addMenuRequest() {
+        var menu = prompt('오늘 뭐 먹고 싶어요?');
+        if (!menu || !menu.trim()) return;
+        var requests = null;
+        try { requests = JSON.parse(localStorage.getItem('menu_requests') || 'null'); } catch (err) {}
+        if (!requests) { requests = [{ name: '박철수', menu: '삼겹살' }, { name: '이지은', menu: '비빔국수' }]; }
+        requests.push({ name: CURRENT_PERSONA, menu: menu.trim() });
+        try { localStorage.setItem('menu_requests', JSON.stringify(requests)); } catch (err) {}
+        renderMenuRequests();
+        showToast('먹고 싶은 메뉴를 알렸어요');
+    }
+
+    // 정하는 사람이 고민될 때 3-2에서 보낸 메뉴 투표 — 가족 누구나 골라줄 수 있게.
+    function voteMenuPoll(name) {
+        var poll = null;
+        try { poll = JSON.parse(localStorage.getItem('menu_poll') || 'null'); } catch (err) {}
+        if (!poll) return;
+        poll.votes = poll.votes || {};
+        poll.votes[CURRENT_PERSONA] = name;
+        try { localStorage.setItem('menu_poll', JSON.stringify(poll)); } catch (err) {}
+        renderPollSection();
+        showToast('골랐어요 · ' + name);
+    }
+
+    function renderPollSection() {
+        var poll = null;
+        try { poll = JSON.parse(localStorage.getItem('menu_poll') || 'null'); } catch (err) {}
+        var section = document.getElementById('pollSection');
+        if (!poll) { section.classList.add('hidden'); return; }
+        section.classList.remove('hidden');
+
+        var myVote = (poll.votes || {})[CURRENT_PERSONA];
+        var voteValues = Object.keys(poll.votes || {}).map(function (voter) { return poll.votes[voter]; });
+        var list = document.getElementById('pollOptionsList');
+        list.innerHTML = '';
+        poll.options.forEach(function (name) {
+            var count = voteValues.filter(function (v) { return v === name; }).length;
+            var isMine = myVote === name;
+            var row = document.createElement('button');
+            row.type = 'button';
+            row.className = 'w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left ' + (isMine ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface');
+            row.innerHTML = '<span class="flex-1 font-body-md text-body-md">' + name + '</span>' +
+                '<span class="font-label-sm text-label-sm ' + (isMine ? 'text-on-primary' : 'text-on-surface-variant') + '">' + count + '표' + (isMine ? ' · 내 선택' : '') + '</span>';
+            row.onclick = function () { voteMenuPoll(name); };
+            list.appendChild(row);
+        });
+    }
+
+    // 헤더 바로 아래 부제 = 이 앱을 왜 쓰는지 한 줄 요약(오늘 몇 명 먹는지 · 몇 명 아직 확인 안 됐는지).
+    // 밀키트 광고판이 아니라 "매번 안 물어봐도 되는" 실제 가치를 첫 줄에서 보여주기 위함.
+    function computeSubtitle() {
+        var todayMeals = MEALS.filter(function (m) { return m.when === '오늘' && m.menu; });
+        if (!todayMeals.length) { return '아직 오늘 식사가 없어요 · 매번 묻지 않아도, 여기서 한눈에 확인해요'; }
+        var attending = 0, pending = 0;
+        todayMeals.forEach(function (m) {
+            m.roster.forEach(function (r) {
+                if (r.status === 'attending') attending++;
+                else if (r.status === 'pending') pending++;
+            });
+        });
+        if (pending === 0) return '오늘 저녁 ' + attending + '명 먹어요 · 다 확인됐어요';
+        return '오늘 저녁 ' + attending + '명 먹어요 · ' + pending + '명 아직 확인 안 됨';
+    }
+
+    // 원형 식탁 둘레에 가족 아바타를 좌석처럼 배치 — 참여(체크 배지)/대기(점선 테두리)/불참(흐리게)을 한 그림으로.
+    function renderTableHero() {
+        var todayMeals = MEALS.filter(function (m) { return m.when === '오늘' && m.menu; });
+        var menuEl = document.getElementById('tableHeroMenu');
+        var seatsEl = document.getElementById('tableHeroSeats');
+        var bubblesEl = document.getElementById('tableHeroBubbles');
+        seatsEl.innerHTML = '';
+        bubblesEl.innerHTML = '';
+
+        if (!todayMeals.length) {
+            menuEl.textContent = '아직 식사가 없어요';
+            document.getElementById('unseenLine').classList.add('hidden');
+            return;
+        }
+        menuEl.textContent = todayMeals[0].menu;
+
+        // '오늘' 식사가 여러 개면(점심+저녁 등) 같은 사람이 두 번 앉지 않게 이름 기준으로 합침(마지막 상태 우선).
+        var statusByName = {};
+        todayMeals.forEach(function (m) {
+            m.roster.forEach(function (r) { statusByName[r.name] = r.status; });
+        });
+        var names = Object.keys(statusByName);
+
+        // 상태를 위치·움직임으로도 구분: 먹어요(착석) = 식탁에 붙어 가만히, 확인 안 됨 = 아직 못 앉고 서성임(흔들림),
+        // 안 먹어요 = 식탁에서 한 걸음 물러남(반경 확대) — "착석하면 먹는다, 서성이면 아직, 물러나면 안 먹는다"는 직관 반영.
+        names.forEach(function (name, i) {
+            var angle = (i * 360 / names.length) - 90; // 12시 방향부터 시계 방향으로 배치
+            var rad = angle * Math.PI / 180;
+            var status = statusByName[name];
+            var radius = status === 'absent' ? 50 : 42; // 컨테이너 대비 %
+            var x = 50 + radius * Math.cos(rad);
+            var y = 50 + radius * Math.sin(rad);
+
+            var seat = document.createElement('div');
+            seat.className = 'absolute w-11 h-11 rounded-full flex items-center justify-center text-on-primary font-label-sm text-label-sm shadow-[0px_2px_6px_rgba(120,119,119,0.15)]' +
+                (status === 'pending' ? ' border-2 border-dashed border-outline seat-wander' : '') +
+                (status === 'absent' ? ' opacity-40' : '');
+            seat.style.left = x + '%';
+            seat.style.top = y + '%';
+            if (status !== 'pending') { seat.style.transform = 'translate(-50%, -50%)'; } // wander 애니메이션이 transform을 직접 관리하므로 겹치지 않게
+            seat.style.backgroundColor = IDENTITY_COLOR[name] || '#8a9a7b';
+            seat.textContent = name.charAt(0);
+            seat.title = name + (status === 'attending' ? ' · 먹어요' : status === 'absent' ? ' · 안 먹어요' : ' · 확인 안 됨');
+
+            if (status === 'attending') {
+                var badge = document.createElement('span');
+                badge.className = 'absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-surface flex items-center justify-center';
+                badge.innerHTML = '<span class="material-symbols-outlined text-primary" style="font-size:12px;">check</span>';
+                seat.appendChild(badge);
+            }
+            seatsEl.appendChild(seat);
+
+            var note = todaysNoteFor(name);
+            if (note) {
+                var bubble = document.createElement('div');
+                // 엑셀 셀 메모 느낌의 노란 포스트잇 — 달력의 "그날의 한마디" 카드와 같은 톤으로 통일.
+                bubble.className = 'absolute font-label-sm text-label-sm px-2 py-1 rounded-sm whitespace-nowrap overflow-hidden text-ellipsis';
+                bubble.style.background = '#fff6d6';
+                bubble.style.border = '1px solid #ecdc9c';
+                bubble.style.color = '#5c4a1a';
+                bubble.style.boxShadow = '2px 2px 4px rgba(120,119,119,0.15)';
+                bubble.style.left = x + '%';
+                bubble.style.top = y + '%';
+                bubble.style.maxWidth = '92px';
+                bubble.style.transform = 'translate(-50%, -170%) rotate(-1.5deg)'; // 좌석 바로 위에 포스트잇처럼 붙여둠
+                bubble.textContent = note.message;
+                bubble.title = name + ': ' + note.message;
+                bubblesEl.appendChild(bubble);
+            }
+        });
+
+        renderUnseenLine(names);
+    }
+
+    (function init() {
+        var params = new URLSearchParams(window.location.search);
+        var persona = params.get('as') || '김영희';
+        CURRENT_PERSONA = persona;
+
+        try {
+            var lastSeen = JSON.parse(localStorage.getItem('last_seen') || '{}');
+            lastSeen[persona] = todayKey();
+            localStorage.setItem('last_seen', JSON.stringify(lastSeen));
+        } catch (err) {}
+
+        var householdName = '우리집';
+        try { householdName = localStorage.getItem('onboarding_household_name') || localStorage.getItem('household_name') || '우리집'; } catch (err) {}
+        document.getElementById('householdTitle').textContent = householdName + ', 오늘 식탁';
+        document.getElementById('householdSubtitle').textContent = computeSubtitle();
+        renderTableHero();
+        renderMyNoteRow();
+        updateNotiDot();
+
+        var myTableHref = '../3-1. 내 식탁/code.html' + (params.get('as') ? ('?as=' + encodeURIComponent(persona)) : '');
+        document.getElementById('myTableLink').href = myTableHref;
+
+        renderMenuRequests();
+        renderPollSection();
+    })();
+</script>
+</body></html>

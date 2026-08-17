@@ -1,0 +1,149 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 요일별 기본 응답</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset py-section-margin">
+
+<header class="flex items-center gap-3 mb-6">
+<button class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-95 transition-transform" onclick="window.location.href='../3-0. 홈/code.html'" aria-label="뒤로">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">요일별 기본 응답</h1>
+</header>
+
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">구성원마다 요일별 기본 참여 여부를 미리 정해두면, 식사를 만들 때 예상 인원에 자동 반영돼요.</p>
+
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] overflow-x-auto mb-4">
+<table class="w-full text-center min-w-[500px]">
+<thead>
+<tr class="font-label-sm text-label-sm text-on-surface-variant">
+<th class="text-left pb-2">이름</th>
+<th class="pb-2">월</th><th class="pb-2">화</th><th class="pb-2">수</th><th class="pb-2">목</th><th class="pb-2">금</th><th class="pb-2">토</th><th class="pb-2">일</th>
+<th class="pb-2">저장</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-4">각 행의 "저장" 버튼으로 사람마다 따로 저장해요 · 남의 행을 바꾸면 한 번 물어봐요</p>
+
+<button class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface font-label-sm text-[15px] py-3 rounded-full active:scale-[0.98] transition-transform" onclick="window.location.href='../5-1. 가구 설정/code.html'">닫기</button>
+
+</main>
+
+<script>
+    var params = new URLSearchParams(window.location.search);
+    var CURRENT_PERSONA = params.get('as') || '김영희';
+
+    var DAYS = ['월', '화', '수', '목', '금', '토', '일'];
+    var DEFAULT_MEMBERS = [
+        { name: '김영희', color: '#8a9a7b', defaults: ['on', 'on', 'on', 'on', 'on', 'off', 'off'] },
+        { name: '박철수', color: '#9b8ab5', defaults: ['on', 'on', 'off', 'on', 'on', 'on', 'off'] },
+        { name: '이지은', color: '#c98a5a', defaults: ['off', 'off', 'off', 'off', 'off', 'on', 'on'] }
+    ];
+
+    // 각자 자기 응답을 각자 저장 — 한 사람이 "저장" 누르면 전원 데이터가 통째로 덮이던 문제를 없앰.
+    function loadMembers() {
+        var saved = [];
+        try { saved = JSON.parse(localStorage.getItem('weekday_defaults') || '[]'); } catch (err) {}
+        return DEFAULT_MEMBERS.map(function (m) {
+            var found = saved.find(function (s) { return s.name === m.name; });
+            return found ? { name: m.name, color: m.color, defaults: found.defaults } : { name: m.name, color: m.color, defaults: m.defaults.slice() };
+        });
+    }
+
+    function persistMember(member) {
+        var saved = [];
+        try { saved = JSON.parse(localStorage.getItem('weekday_defaults') || '[]'); } catch (err) {}
+        var idx = saved.findIndex(function (s) { return s.name === member.name; });
+        if (idx === -1) saved.push(member); else saved[idx] = member;
+        try { localStorage.setItem('weekday_defaults', JSON.stringify(saved)); } catch (err) {}
+    }
+
+    var MEMBERS = loadMembers();
+
+    function cycle(state) {
+        if (state === 'on') return 'off';
+        if (state === 'off') return 'unset';
+        return 'on';
+    }
+    function stateLabel(state) {
+        return state === 'on' ? '참여' : state === 'off' ? '안먹음' : '미정';
+    }
+    function stateColor(state) {
+        return state === 'on' ? '#8a9a7b' : state === 'off' ? '#cabfe0' : '#ded3ef';
+    }
+
+    var body = document.getElementById('tableBody');
+    MEMBERS.forEach(function (member, mi) {
+        var isMine = member.name === CURRENT_PERSONA;
+        var row = document.createElement('tr');
+        if (isMine) { row.className = 'bg-surface-container'; }
+        var nameCell = document.createElement('td');
+        nameCell.className = 'text-left py-2';
+        nameCell.innerHTML = '<span class="inline-flex items-center gap-2"><span class="w-6 h-6 rounded-full flex items-center justify-center text-on-primary font-label-sm text-label-sm" style="background:' + member.color + '">' + member.name.charAt(0) + '</span>' + member.name + (isMine ? ' (나)' : '') + '</span>';
+        row.appendChild(nameCell);
+
+        member.defaults.forEach(function (state, di) {
+            var cell = document.createElement('td');
+            cell.className = 'py-2';
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'w-11 h-11 rounded-full font-label-sm text-[11px] text-on-surface';
+            btn.style.background = stateColor(state);
+            btn.textContent = stateLabel(state);
+            btn.onclick = function () {
+                // 남의 행을 바꾸는 거면 한 번 확인 — 가족이라 다 같이 수정 가능은 유지하되, 실수로 남의 응답을 건드리지 않게.
+                if (!isMine && !confirm(member.name + '님의 응답인데 수정해도 괜찮아요?')) { return; }
+                member.defaults[di] = cycle(member.defaults[di]);
+                btn.style.background = stateColor(member.defaults[di]);
+                btn.textContent = stateLabel(member.defaults[di]);
+            };
+            cell.appendChild(btn);
+            row.appendChild(cell);
+        });
+
+        // 사람마다 각각 저장 — 한 사람 저장이 다른 사람 행에 영향 없음.
+        var saveCell = document.createElement('td');
+        saveCell.className = 'py-2';
+        var saveBtn = document.createElement('button');
+        saveBtn.type = 'button';
+        saveBtn.className = 'px-3 py-1.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm';
+        saveBtn.textContent = '저장';
+        saveBtn.onclick = function () {
+            persistMember(member);
+            saveBtn.textContent = '저장됨';
+            setTimeout(function () { saveBtn.textContent = '저장'; }, 1200);
+        };
+        saveCell.appendChild(saveBtn);
+        row.appendChild(saveCell);
+
+        body.appendChild(row);
+    });
+</script>
+</body></html>

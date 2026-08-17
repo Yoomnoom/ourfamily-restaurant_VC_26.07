@@ -1,0 +1,140 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 설정</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff", "error": "#ba1a1a"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>
+    body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }
+    .switch { width: 44px; height: 26px; border-radius: 999px; position: relative; transition: background-color .15s; }
+    .switch .knob { width: 20px; height: 20px; border-radius: 999px; background: #fff; position: absolute; top: 3px; left: 3px; transition: left .15s; }
+    .switch.on { background: #6d5a92; }
+    .switch.on .knob { left: 21px; }
+    .switch.off { background: #ded3ef; }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset py-section-margin pb-28">
+
+<header class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1; font-size: 26px;">restaurant</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">설정</h1>
+</header>
+
+<!-- 내 프로필: 온보딩 때 넣은 사진·이름이 실제로 어딘가엔 보여야 하니까 -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_12px_rgba(120,119,119,0.08)] mb-4 p-card-padding flex items-center gap-3">
+<div id="profileAvatar" class="w-14 h-14 rounded-full flex items-center justify-center text-on-primary font-headline-lg text-headline-lg shrink-0 overflow-hidden" style="background-color:#8a9a7b;">?</div>
+<div class="flex-1 min-w-0">
+<p id="profileName" class="font-body-md text-body-md text-on-surface font-medium">-</p>
+<p id="profileEmail" class="font-label-sm text-label-sm text-on-surface-variant"></p>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_12px_rgba(120,119,119,0.08)] mb-4 divide-y divide-outline-variant">
+<div class="flex items-center justify-between px-4 py-3.5">
+<span class="font-body-md text-body-md text-on-surface">앱 푸시 알림</span>
+<button id="pushSwitch" class="switch on" onclick="toggleSwitch(this)"><span class="knob"></span></button>
+</div>
+<div class="flex items-center justify-between px-4 py-3.5">
+<span class="font-body-md text-body-md text-on-surface">응답 변경 알림</span>
+<button id="changeSwitch" class="switch on" onclick="toggleSwitch(this)"><span class="knob"></span></button>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_12px_rgba(120,119,119,0.08)] mb-6 divide-y divide-outline-variant">
+<div class="flex items-center justify-between px-4 py-3.5">
+<span class="font-body-md text-body-md text-on-surface">휴대폰 번호</span>
+<span id="phoneNumber" class="font-label-sm text-label-sm text-on-surface-variant">010-1234-5678</span>
+</div>
+</div>
+
+<details class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_12px_rgba(120,119,119,0.08)] px-4 py-3.5 mb-6">
+<summary class="font-body-md text-body-md text-on-surface cursor-pointer flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">payments</span>
+다음 단계 로드맵 (준비 중)
+</summary>
+<ul class="mt-3 flex flex-col gap-1.5">
+<li class="font-label-sm text-label-sm text-on-surface-variant">식사별 금액 · 월 식비 예산</li>
+<li class="font-label-sm text-label-sm text-on-surface-variant">공동 결제 · 분담 · 정산</li>
+<li class="font-label-sm text-label-sm text-on-surface-variant">음식 사진 기록</li>
+<li class="font-label-sm text-label-sm text-on-surface-variant">소비 패턴 기반 밀키트 배송일 제안</li>
+</ul>
+</details>
+
+<button class="w-full py-3 rounded-full border border-outline-variant text-error font-label-sm text-label-sm" onclick="if(confirm('로그아웃 할까요?')) window.location.href='../2-1.로그인 화면/code.html'">로그아웃</button>
+
+</main>
+
+<nav class="fixed bottom-0 left-0 right-0 z-10 bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant" style="padding-bottom: env(safe-area-inset-bottom);">
+<div class="max-w-[600px] mx-auto flex items-stretch">
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../3-0. 홈/code.html'">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">홈</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../3-1. 내 식탁/code.html'">
+<span class="material-symbols-outlined">table_restaurant</span>
+<span class="font-label-sm text-label-sm">내 식탁</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../4-1. 홈 달력뷰/code.html'">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-label-sm">달력</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../7-1. 우리집 냉장고/code.html'">
+<span class="material-symbols-outlined">kitchen</span>
+<span class="font-label-sm text-label-sm">냉장고</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-sm text-label-sm">설정</span>
+</button>
+</div>
+</nav>
+
+<script>
+    function toggleSwitch(el) {
+        el.classList.toggle('on');
+        el.classList.toggle('off');
+    }
+
+    (function renderProfile() {
+        var signup = null;
+        try { signup = JSON.parse(localStorage.getItem('onboarding_signup') || 'null'); } catch (err) {}
+        var nickname = '김영희';
+        var photo = null;
+        var email = '';
+        var phone = null;
+        try {
+            nickname = localStorage.getItem('onboarding_nickname') || nickname;
+            photo = localStorage.getItem('onboarding_profile_photo');
+        } catch (err) {}
+        if (signup) { email = signup.email || ''; phone = signup.phone || null; }
+
+        document.getElementById('profileName').textContent = nickname;
+        document.getElementById('profileEmail').textContent = email;
+        document.getElementById('phoneNumber').textContent = phone || '등록 안 됨';
+
+        var avatar = document.getElementById('profileAvatar');
+        if (photo) { avatar.innerHTML = '<img src="' + photo + '" class="w-full h-full object-cover">'; }
+        else { avatar.textContent = nickname.trim().charAt(0) || '?'; }
+    })();
+</script>
+</body></html>

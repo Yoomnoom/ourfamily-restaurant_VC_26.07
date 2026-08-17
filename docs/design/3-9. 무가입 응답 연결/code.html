@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 계정 연결</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff", "tertiary-container": "#fef4e9", "on-tertiary-container": "#766f66"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "emotional-quote": ["Noto Serif"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "emotional-quote": ["19px", { "lineHeight": "28px", "fontWeight": "400" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center justify-center">
+<main class="w-full max-w-[420px] flex flex-col px-safe-area-inset py-section-margin">
+
+<div id="confirmView" class="text-center">
+<span class="material-symbols-outlined text-primary mb-4" style="font-size:48px;">link</span>
+<h1 class="font-emotional-quote text-emotional-quote text-on-surface mb-3">저장된 응답이 있어요</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6"><span id="nameSlot">김하준</span>님, 전에 개인 링크로 응답한 적이 있어요. 지금 계정에 연결할까요?</p>
+
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] mb-8 text-left">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">연결되면</p>
+<p class="font-body-md text-body-md text-on-surface">지난 응답 기록이 그대로 이어지고, 이제부터 가구 홈에서 알림과 일정을 한곳에서 볼 수 있어요.</p>
+</div>
+
+<button class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-[0.98] transition-transform mb-2" onclick="connectAccount()">연결하기</button>
+<button class="w-full py-3 rounded-full text-on-surface-variant font-label-sm text-label-sm" onclick="window.location.href='../1-1. 온보딩-회원가입/code.html'">아니요, 새로 시작할게요</button>
+</div>
+
+<div id="doneView" class="hidden text-center">
+<span class="material-symbols-outlined text-primary mb-4" style="font-size:52px; font-variation-settings:'FILL' 1;">check_circle</span>
+<h1 class="font-emotional-quote text-emotional-quote text-on-surface mb-2">연결됐어요!</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">이제 가구 홈에서 모든 소식을 한곳에서 볼 수 있어요.</p>
+<button class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full active:scale-[0.98] transition-transform" onclick="goHome()">홈으로 가기</button>
+</div>
+
+</main>
+
+<script>
+    var personaName = '김하준';
+
+    function connectAccount() {
+        document.getElementById('confirmView').classList.add('hidden');
+        document.getElementById('doneView').classList.remove('hidden');
+    }
+
+    function goHome() {
+        window.location.href = '../3-1. 내 식탁/code.html?as=' + encodeURIComponent(personaName);
+    }
+
+    (function init() {
+        var params = new URLSearchParams(window.location.search);
+        personaName = params.get('name') || '김하준';
+        document.getElementById('nameSlot').textContent = personaName;
+    })();
+</script>
+</body></html>

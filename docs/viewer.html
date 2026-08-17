@@ -58,24 +58,36 @@
   </div>
 </main>
 <script>
-  // docs/screen-specs.md의 폴더명과 정확히 일치해야 한다.
+  // 실제 디자인 원본 목업(수업34일차_우리집식당_임시디자인2)을 그대로 복사해온 폴더들.
+  // (구현) = 지금 실제 앱에 해당 흐름이 있음 / (범위 밖) = 이번 단계 핸드오프 §12에서 제외한 기능, 참고용.
   var STATIC_SCREENS = [
-    ["design/01. 로그인/code.html", "1. 로그인"],
-    ["design/02. 온보딩/code.html", "2. 온보딩"],
-    ["design/03. 홈-오늘식사/code.html", "3. 홈 (오늘 식사 있음)"],
-    ["design/04. 홈-빈상태/code.html", "4. 홈 (빈 상태)"],
-    ["design/05. 내식탁/code.html", "5. 내 식탁"],
-    ["design/06. 달력/code.html", "6. 달력"],
-    ["design/07. 기록/code.html", "7. 기록"],
-    ["design/08. 식사만들기/code.html", "8. 식사 만들기"],
-    ["design/09. 식사만들기-완료/code.html", "9. 식사 만들기 완료"],
-    ["design/10. 게스트응답/code.html", "10. 게스트 응답"],
-    ["design/11. 게스트응답-완료/code.html", "11. 게스트 응답 완료"],
-    ["design/12. 게스트응답-오류/code.html", "12. 게스트 응답 오류"],
-    ["design/13. 알림패널/code.html", "13. 알림 패널"],
-    ["design/14. 전체메뉴/code.html", "14. 전체 메뉴"],
-    ["design/15. 가구선택/code.html", "15. 가구 선택"],
-    ["design/16. 가족구성원/code.html", "16. 가족 구성원"]
+    ["design/1-1. 온보딩-회원가입/code.html", "1-1. 온보딩 회원가입"],
+    ["design/1-2. 온보딩-시작하기/code.html", "1-2. 온보딩 시작하기 (구현: 가구 만들기)"],
+    ["design/1-3. 온보딩-가구프로필/code.html", "1-3. 온보딩 가구 프로필"],
+    ["design/1-4. 온보딩-가족구성원/code.html", "1-4. 온보딩 가족 구성원"],
+    ["design/2-1.로그인 화면/code.html", "2-1. 로그인 화면"],
+    ["design/2-2. 로그인/code.html", "2-2. 로그인 (구현)"],
+    ["design/3-0. 홈/code.html", "3-0. 홈 (구현)"],
+    ["design/3-1. 내 식탁/code.html", "3-1. 내 식탁 (구현)"],
+    ["design/3-2. 식사 만들기/code.html", "3-2. 식사 만들기 (구현)"],
+    ["design/3-3. 참여자 응답/code.html", "3-3. 참여자 응답 (구현: 게스트 응답)"],
+    ["design/3-4. 확정 전 요약/code.html", "3-4. 확정 전 요약 (미구현)"],
+    ["design/3-5. 오늘의 식탁 완성/code.html", "3-5. 오늘의 식탁 완성 (미구현)"],
+    ["design/3-7. 홈 빈 상태/code.html", "3-7. 홈 빈 상태 (구현)"],
+    ["design/3-8. 참여자 링크 공유/code.html", "3-8. 참여자 링크 공유 (구현)"],
+    ["design/3-9. 무가입 응답 연결/code.html", "3-9. 무가입 응답 연결 (구현)"],
+    ["design/4-1. 홈 달력뷰/code.html", "4-1. 달력 (구현)"],
+    ["design/5-1. 가구 설정/code.html", "5-1. 가구 설정 (부분 구현: 팝오버/구성원패널)"],
+    ["design/5-2. 식사 기록/code.html", "5-2. 식사 기록 (구현)"],
+    ["design/5-3. 설정/code.html", "5-3. 설정 (미구현)"],
+    ["design/5-4. 요일별 기본 응답/code.html", "5-4. 요일별 기본 응답 (범위 밖)"],
+    ["design/6-1. 오류·복구 상태/code.html", "6-1. 오류·복구 상태 (참고)"],
+    ["design/7-1. 우리집 냉장고/code.html", "7-1. 우리집 냉장고 (범위 밖)"],
+    ["design/7-3. 메뉴 추천/code.html", "7-3. 메뉴 추천 (범위 밖)"],
+    ["design/8-1. 밀키트 주문/code.html", "8-1. 밀키트 주문 (범위 밖)"],
+    ["design/8-2. 식사 사진 기록/code.html", "8-2. 식사 사진 기록 (범위 밖)"],
+    ["design/8-3. 식비 예산/code.html", "8-3. 식비 예산 (범위 밖)"],
+    ["design/8-4. 정산/code.html", "8-4. 정산 (범위 밖)"]
   ];
   var LIVE_ROUTES = [
     ["/login", "로그인 (매직링크 + 패스키)"],

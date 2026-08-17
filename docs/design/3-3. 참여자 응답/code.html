@@ -1,0 +1,263 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 오늘 저녁은요?</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f6f3f3",
+                      "on-error-container": "#93000a",
+                      "on-secondary": "#ffffff",
+                      "surface-variant": "#e4e2e2",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#e3e2e3",
+                      "surface-container": "#f0eded",
+                      "on-secondary-fixed-variant": "#464748",
+                      "on-error": "#ffffff",
+                      "outline-variant": "#c6c6ca",
+                      "on-tertiary-fixed-variant": "#4b463e",
+                      "on-surface-variant": "#45474a",
+                      "tertiary-fixed-dim": "#cec5bb",
+                      "outline": "#76777b",
+                      "on-primary-container": "#6f7074",
+                      "on-secondary-fixed": "#1b1c1d",
+                      "error-container": "#ffdad6",
+                      "on-primary-fixed": "#1a1c1f",
+                      "inverse-surface": "#303030",
+                      "on-surface": "#1b1c1c",
+                      "secondary-fixed-dim": "#c7c6c7",
+                      "inverse-primary": "#5d5e62",
+                      "secondary-fixed": "#e3e2e3",
+                      "tertiary-fixed": "#ebe1d6",
+                      "error": "#ba1a1a",
+                      "inverse-on-surface": "#f3f0f0",
+                      "surface": "#fbf9f8",
+                      "on-tertiary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#eae7e7",
+                      "tertiary": "#645d55",
+                      "primary": "#5d5e62",
+                      "on-tertiary-container": "#766f66",
+                      "primary-fixed": "#e2e2e6",
+                      "tertiary-container": "#fef4e9",
+                      "primary-container": "#f5f5f9",
+                      "surface-dim": "#dcd9d9",
+                      "surface-container-highest": "#e4e2e2",
+                      "on-secondary-container": "#646465",
+                      "primary-fixed-dim": "#c6c6ca",
+                      "surface-tint": "#5d5e62",
+                      "background": "#fbf9f8",
+                      "secondary": "#5e5e5f",
+                      "on-primary-fixed-variant": "#45474a",
+                      "surface-bright": "#fbf9f8",
+                      "on-background": "#1b1c1c",
+                      "on-tertiary-fixed": "#1f1b15"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-margin": "2rem",
+                      "card-padding": "1.25rem",
+                      "safe-area-inset": "1rem",
+                      "stack-gap": "1rem"
+              },
+              "fontFamily": {
+                      "body-md": ["Plus Jakarta Sans"],
+                      "display-serif": ["Noto Serif"],
+                      "emotional-quote": ["Noto Serif"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "label-sm": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "display-serif": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                      "emotional-quote": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      },
+          },
+        }
+      </script>
+<style>body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center justify-center">
+
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bg-on-surface text-surface font-label-sm text-label-sm px-4 py-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300" style="bottom:24px; z-index:100;"></div>
+
+<main class="w-full max-w-[420px] flex flex-col px-safe-area-inset py-section-margin">
+
+<!-- Invite Splash (진입 직후, 응답 폼 전) -->
+<div id="inviteView" class="text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-6">🍴 우리집식당</p>
+<h1 class="font-emotional-quote text-emotional-quote text-on-surface mb-3"><span id="inviteName">진영</span>님, 초대받은 식사가 있어요</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-8">아래 버튼을 눌러 참여 여부를 알려주세요.</p>
+<button class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-[0.98] transition-transform" onclick="showForm()">응답 시작하기</button>
+</div>
+
+<!-- Response Form -->
+<div id="formView" class="hidden">
+<p class="text-center font-label-sm text-label-sm text-on-surface-variant mb-6">🍴 우리집식당</p>
+
+<h1 class="font-emotional-quote text-emotional-quote text-on-surface text-center mb-6"><span id="guestName">진영</span>님, 오늘 저녁은요?</h1>
+
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] mb-6 text-center">
+<p class="font-headline-lg text-headline-lg text-on-surface mb-1">김치찌개 외 2개</p>
+<p class="font-body-md text-body-md text-on-surface-variant">19:00 도착 예정</p>
+</div>
+
+<div class="grid grid-cols-2 gap-3 mb-4">
+<button id="btnAttend" type="button" class="py-5 rounded-xl border-2 border-outline-variant font-label-sm text-[15px] transition-colors" onclick="selectAttend(true)">먹어요</button>
+<button id="btnAbsent" type="button" class="py-5 rounded-xl border-2 border-outline-variant font-label-sm text-[15px] transition-colors" onclick="selectAttend(false)">안 먹어요</button>
+</div>
+
+<div id="arrivalBlock" class="hidden mb-4">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-2">몇 시쯤 오세요?</p>
+<div class="flex gap-2">
+<button type="button" class="arrival-chip flex-1 py-2.5 rounded-full border border-outline-variant font-label-sm text-label-sm" onclick="selectArrival(this,'제시간')">제시간</button>
+<button type="button" class="arrival-chip flex-1 py-2.5 rounded-full border border-outline-variant font-label-sm text-label-sm" onclick="selectArrival(this,'좀 늦어요')">좀 늦어요</button>
+<button type="button" class="arrival-chip flex-1 py-2.5 rounded-full border border-outline-variant font-label-sm text-label-sm" onclick="selectArrival(this,'모르겠어요')">모르겠어요</button>
+</div>
+</div>
+
+<details class="mb-6">
+<summary class="font-label-sm text-label-sm text-on-surface-variant cursor-pointer">+ 할 말 있어요 (선택)</summary>
+<textarea id="noteInput" rows="2" placeholder="예: 8시쯤 도착해요" class="w-full mt-2 border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md bg-surface-container-lowest"></textarea>
+</details>
+
+<button class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-[0.98] transition-transform" onclick="submitResponse()">응답 완료</button>
+</div>
+
+<!-- Completed View -->
+<div id="doneView" class="hidden text-center">
+<span class="material-symbols-outlined text-primary mb-4" style="font-size:56px; font-variation-settings:'FILL' 1;">check_circle</span>
+<h1 class="font-emotional-quote text-emotional-quote text-on-surface mb-2">응답이 저장되었어요</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">확정 전까지 언제든 수정할 수 있어요.</p>
+
+<div id="signupPrompt" class="hidden bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] mb-4 text-left">
+<p class="font-body-md text-body-md text-on-surface mb-1">다음에도 이렇게 편하게 응답하고 싶다면</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-4">가입하면 내 응답 기록과 알림을 한곳에서 볼 수 있어요.</p>
+<button class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-3 rounded-full active:scale-[0.98] transition-transform" onclick="goSignup()">가입하고 계속하기</button>
+</div>
+
+<button class="w-full py-2 font-label-sm text-label-sm text-primary" onclick="editResponse()">응답 수정하기</button>
+</div>
+
+</main>
+
+<script>
+    // 참고문서 §7.6: 무가입 응답자 유형에 따라 완료 후 안내가 달라짐.
+    // guest = 일회성 손님(가입 유도 없음), member_unsigned = 가입은 안 했지만 가입하고 싶은 가족(가입 유도 표시)
+    var PERSONAS = {
+        '최유진': { kind: 'guest' },
+        '박철수': { kind: 'member_signed' },
+        '김하준': { kind: 'member_unsigned' }
+    };
+    var currentPersona = '진영';
+
+    var toastTimer;
+    function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.remove('opacity-0');
+        toast.classList.add('opacity-100');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('opacity-100'); toast.classList.add('opacity-0'); }, 2600);
+    }
+
+    var attending = null;
+    var arrival = null;
+    var firstChoice = null;
+    var hasSubmittedOnce = false;
+
+    function showForm() {
+        document.getElementById('inviteView').classList.add('hidden');
+        document.getElementById('formView').classList.remove('hidden');
+    }
+
+    function goSignup() {
+        window.location.href = '../3-9. 무가입 응답 연결/code.html?name=' + encodeURIComponent(currentPersona);
+    }
+
+    function editResponse() {
+        document.getElementById('doneView').classList.add('hidden');
+        document.getElementById('signupPrompt').classList.add('hidden');
+        document.getElementById('formView').classList.remove('hidden');
+    }
+
+    function selectAttend(value) {
+        attending = value;
+        var attendBtn = document.getElementById('btnAttend');
+        var absentBtn = document.getElementById('btnAbsent');
+        attendBtn.classList.toggle('bg-primary', value === true);
+        attendBtn.classList.toggle('text-on-primary', value === true);
+        attendBtn.classList.toggle('border-primary', value === true);
+        absentBtn.classList.toggle('bg-surface-container-high', value === false);
+        absentBtn.classList.toggle('border-outline', value === false);
+        document.getElementById('arrivalBlock').classList.toggle('hidden', value !== true);
+    }
+
+    function selectArrival(btn, value) {
+        arrival = value;
+        document.querySelectorAll('.arrival-chip').forEach(function (chip) {
+            chip.classList.remove('bg-primary', 'text-on-primary', 'border-primary');
+        });
+        btn.classList.add('bg-primary', 'text-on-primary', 'border-primary');
+    }
+
+    function notifyHostOfChange(fromValue, toValue) {
+        // 3-0/3-1/3-7의 알림 패널이 type 기준으로 상세를 그려서(showNotiDetail), 그 스키마와 맞춰야 함.
+        var fromLabel = fromValue ? '먹어요' : '안 먹어요';
+        var toLabel = toValue ? '먹어요' : '안 먹어요';
+        var notice = {
+            id: 'notif' + Date.now() + Math.random().toString(36).slice(2, 6),
+            icon: 'sync_alt', color: '#9b8ab5',
+            title: currentPersona + '님이 응답을 바꿨어요',
+            body: fromLabel + ' → ' + toLabel,
+            time: '방금 전', unread: true,
+            type: 'response_change', name: currentPersona, from: fromLabel, to: toLabel
+        };
+        var notices = [];
+        try { notices = JSON.parse(localStorage.getItem('notifications') || '[]'); } catch (err) {}
+        notices.unshift(notice);
+        try { localStorage.setItem('notifications', JSON.stringify(notices)); } catch (err) {}
+    }
+
+    function submitResponse() {
+        if (attending === null) { showToast('참여 여부를 선택해주세요.'); return; }
+
+        if (hasSubmittedOnce && firstChoice !== attending) {
+            notifyHostOfChange(firstChoice, attending);
+        }
+        firstChoice = attending;
+        hasSubmittedOnce = true;
+
+        document.getElementById('formView').classList.add('hidden');
+        document.getElementById('doneView').classList.remove('hidden');
+
+        var persona = PERSONAS[currentPersona] || { kind: 'guest' };
+        if (persona.kind === 'member_unsigned') {
+            document.getElementById('signupPrompt').classList.remove('hidden');
+        }
+    }
+
+    (function init() {
+        var params = new URLSearchParams(window.location.search);
+        currentPersona = params.get('name') || '진영';
+        document.getElementById('inviteName').textContent = currentPersona;
+        document.getElementById('guestName').textContent = currentPersona;
+    })();
+</script>
+</body></html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 밀키트 주문</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff", "tertiary-container": "#fef4e9", "on-tertiary-container": "#766f66"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "emotional-quote": ["Noto Serif"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "emotional-quote": ["19px", { "lineHeight": "28px", "fontWeight": "400" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset py-section-margin">
+
+<!-- 제안 -->
+<div id="orderView">
+<header class="flex items-center gap-3 mb-6">
+<button class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-95 transition-transform" onclick="window.location.href='../3-0. 홈/code.html'" aria-label="뒤로">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">밀키트로 채워볼까요</h1>
+</header>
+
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] mb-4">
+<div class="flex items-center gap-3 mb-3">
+<span class="text-3xl">🥘</span>
+<div class="flex-1">
+<h2 id="kitName" class="font-headline-lg text-headline-lg text-on-surface">감자볶음 밀키트</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">손질된 재료 그대로, 볶기만 하면 완성</p>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1.5">이 레시피에 부족한 재료예요</p>
+<div id="ingredientChips" class="flex flex-wrap gap-1.5 mb-3"></div>
+<div class="flex items-center justify-between border-t border-outline-variant pt-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant">참고 가격</span>
+<span class="font-headline-lg text-headline-lg text-on-surface">12,900원</span>
+</div>
+</div>
+
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center mb-4">우리집식당은 조율만 도와요 · 실제 주문·배송은 제휴사에서 진행돼요</p>
+
+<button class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-[0.98] transition-transform flex items-center justify-center gap-2" onclick="placeOrder()">
+제휴사에서 보기
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</button>
+</div>
+
+<!-- 완료 -->
+<div id="doneView" class="hidden text-center py-8">
+<span class="material-symbols-outlined text-primary mb-4" style="font-size:52px; font-variation-settings:'FILL' 1;">check_circle</span>
+<h1 class="font-emotional-quote text-emotional-quote text-on-surface mb-2">연결 준비 중이에요</h1>
+<p id="doneMessage" class="font-body-md text-body-md text-on-surface-variant mb-6">제휴사 연동은 아직 준비 중이에요 · 곧 만나요</p>
+<button class="w-full bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full active:scale-[0.98] transition-transform" onclick="window.location.href='../3-1. 내 식탁/code.html'">홈으로</button>
+</div>
+
+</main>
+
+<script>
+    (function init() {
+        var order = null;
+        try { order = JSON.parse(localStorage.getItem('milkit_order') || 'null'); } catch (err) {}
+
+        var chips = document.getElementById('ingredientChips');
+        if (order && order.missing && order.missing.length) {
+            document.getElementById('kitName').textContent = order.recipeName + ' 밀키트';
+            order.missing.forEach(function (n) {
+                var chip = document.createElement('span');
+                chip.className = 'font-label-sm text-label-sm bg-tertiary-container text-on-tertiary-container px-2 py-1 rounded-full';
+                chip.textContent = n;
+                chips.appendChild(chip);
+            });
+        } else {
+            ['감자', '양파', '대파', '당근'].forEach(function (n) {
+                var chip = document.createElement('span');
+                chip.className = 'font-label-sm text-label-sm bg-tertiary-container text-on-tertiary-container px-2 py-1 rounded-full';
+                chip.textContent = n;
+                chips.appendChild(chip);
+            });
+        }
+
+    })();
+
+    function placeOrder() {
+        try { localStorage.removeItem('milkit_order'); } catch (err) {}
+        document.getElementById('orderView').classList.add('hidden');
+        document.getElementById('doneView').classList.remove('hidden');
+    }
+</script>
+</body></html>

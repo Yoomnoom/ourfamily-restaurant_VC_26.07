@@ -1,0 +1,165 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 식사 기록</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset py-section-margin">
+
+<header class="flex items-center gap-3 mb-6">
+<button class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-95 transition-transform" onclick="window.location.href='../3-0. 홈/code.html'" aria-label="뒤로">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">식사 기록</h1>
+</header>
+
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] mb-4">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">이번 달 총 식사</p>
+<p class="font-headline-lg text-headline-lg text-on-surface mb-3">18<span class="font-body-md text-body-md text-on-surface-variant">회</span></p>
+<div class="w-full h-3 rounded-full overflow-hidden flex bg-surface-container mb-3">
+<div class="h-full" style="width:78%; background:#7a6300;"></div>
+<div class="h-full" style="width:22%; background:#b8621f;"></div>
+</div>
+<div class="flex justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full inline-block" style="background:#7a6300;"></span>
+<span class="font-body-md text-body-md text-on-surface-variant">직접 조리 <b class="text-on-surface">14회</b></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full inline-block" style="background:#b8621f;"></span>
+<span class="font-body-md text-body-md text-on-surface-variant">주문 <b class="text-on-surface">4회</b></span>
+</div>
+</div>
+<button type="button" class="w-full text-center font-label-sm text-label-sm text-primary py-1 border-t border-outline-variant pt-3" onclick="window.location.href='../8-3. 식비 예산/code.html'">이번 달 식비 예산 보기 →</button>
+</div>
+
+<div class="relative mb-4">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input id="searchInput" type="text" placeholder="메뉴로 검색 (예: 삼겹살)" class="w-full pl-10 pr-3 py-2.5 rounded-full border border-outline-variant font-body-md text-body-md bg-surface-container-lowest" oninput="renderRecords()">
+</div>
+
+<div id="recordList" class="flex flex-col gap-3"></div>
+
+</main>
+
+<script>
+    var RECORDS = [
+        { date: '8월 16일 (오늘)', dateKey: '2024-08-16', menus: ['김치찌개', '계란말이'], count: 2, participants: ['김영희 (나)', '박철수'] },
+        { date: '8월 13일 (화)', dateKey: '2024-08-13', menus: ['김치찌개', '계란말이'], count: 4, participants: ['김영희 (나)', '박철수', '이지은'] },
+        { date: '8월 9일 (금)', dateKey: '2024-08-09', menus: ['된장찌개', '나물무침'], count: 3, participants: ['김영희 (나)', '박철수'] },
+        { date: '8월 3일 (토)', dateKey: '2024-08-03', menus: ['삼겹살', '상추쌈'], count: 5, participants: ['김영희 (나)', '박철수', '이지은'] }
+    ];
+
+    function reuse(index) {
+        var record = RECORDS[index];
+        try {
+            localStorage.setItem('reuse_meal', JSON.stringify({ menus: record.menus, participants: record.participants }));
+        } catch (err) {}
+        window.location.href = '../3-2. 식사 만들기/code.html';
+    }
+
+    function editCost(dateKey) {
+        var costs = {};
+        try { costs = JSON.parse(localStorage.getItem('meal_costs') || '{}'); } catch (err) {}
+        var input = prompt('이 식사에 쓴 금액을 입력해주세요 (원)', costs[dateKey] || '');
+        if (input === null) return;
+        var value = parseInt(input.replace(/[^0-9]/g, ''), 10);
+        if (isNaN(value)) return;
+        costs[dateKey] = value;
+        try { localStorage.setItem('meal_costs', JSON.stringify(costs)); } catch (err) {}
+        renderRecords();
+    }
+
+    var RECORD_PREVIEW_COUNT = 5; // 기록이 쌓일수록 무한정 길어지지 않게 — 홈의 "더보기" 패턴과 동일
+    var recordsExpanded = false;
+
+    function renderRecords() {
+        var query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+        var photos = {};
+        try { photos = JSON.parse(localStorage.getItem('meal_photos') || '{}'); } catch (err) {}
+        var costs = {};
+        try { costs = JSON.parse(localStorage.getItem('meal_costs') || '{}'); } catch (err) {}
+        var list = document.getElementById('recordList');
+        list.innerHTML = '';
+
+        var matching = [];
+        RECORDS.forEach(function (record, index) {
+            if (query && record.menus.join(' ').toLowerCase().indexOf(query) === -1) return;
+            matching.push(index);
+        });
+        var visible = recordsExpanded ? matching : matching.slice(0, RECORD_PREVIEW_COUNT);
+
+        visible.forEach(function (index) {
+            var record = RECORDS[index];
+            var photo = photos[record.dateKey];
+            var cost = costs[record.dateKey];
+            var row = document.createElement('div');
+            row.className = 'bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] flex gap-3';
+            row.innerHTML =
+                (photo ? '<img src="' + photo.photo + '" class="w-14 h-14 rounded-lg object-cover shrink-0">' : '') +
+                '<div class="flex-1 min-w-0">' +
+                '<div class="flex items-center justify-between mb-1">' +
+                '<span class="font-body-md text-body-md text-on-surface font-medium">' + record.date + '</span>' +
+                '<span class="font-label-sm text-label-sm text-on-surface-variant">참여 ' + record.count + '명</span>' +
+                '</div>' +
+                '<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">' + record.menus.join(' · ') + '</p>' +
+                (photo && photo.caption ? '<p class="font-label-sm text-label-sm text-on-surface-variant italic mb-2">"' + photo.caption + '"</p>' : '') +
+                '<div class="flex items-center gap-3 mb-1">' +
+                '<button type="button" class="cost-btn font-label-sm text-label-sm text-primary py-1">' + (cost ? cost.toLocaleString() + '원 · 수정' : '+ 비용 입력') + '</button>' +
+                (cost ? '<button type="button" class="settle-btn font-label-sm text-label-sm text-primary py-1">정산하기 →</button>' : '') +
+                '</div>' +
+                '<button type="button" class="w-full py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-sm text-label-sm mt-2">이 구성으로 새 식사 만들기</button>' +
+                '</div>';
+            row.querySelector('.cost-btn').addEventListener('click', function () { editCost(record.dateKey); });
+            var settleBtn = row.querySelector('.settle-btn');
+            if (settleBtn) { settleBtn.addEventListener('click', function () { window.location.href = '../8-4. 정산/code.html?date=' + record.dateKey; }); }
+            row.querySelector('.w-full.py-2.rounded-full').addEventListener('click', function () { reuse(index); });
+            list.appendChild(row);
+        });
+
+        if (!matching.length) {
+            var empty = document.createElement('p');
+            empty.className = 'font-label-sm text-label-sm text-on-surface-variant text-center py-6';
+            empty.textContent = '검색 결과가 없어요.';
+            list.appendChild(empty);
+        } else if (!recordsExpanded && matching.length > RECORD_PREVIEW_COUNT) {
+            var moreBtn = document.createElement('button');
+            moreBtn.type = 'button';
+            moreBtn.className = 'w-full text-center font-label-sm text-label-sm text-primary py-1.5';
+            moreBtn.textContent = '+ ' + (matching.length - RECORD_PREVIEW_COUNT) + '개 더보기';
+            moreBtn.onclick = function () { recordsExpanded = true; renderRecords(); };
+            list.appendChild(moreBtn);
+        } else if (recordsExpanded && matching.length > RECORD_PREVIEW_COUNT) {
+            var lessBtn = document.createElement('button');
+            lessBtn.type = 'button';
+            lessBtn.className = 'w-full text-center font-label-sm text-label-sm text-on-surface-variant py-1.5';
+            lessBtn.textContent = '접기';
+            lessBtn.onclick = function () { recordsExpanded = false; renderRecords(); };
+            list.appendChild(lessBtn);
+        }
+    }
+    renderRecords();
+</script>
+</body></html>

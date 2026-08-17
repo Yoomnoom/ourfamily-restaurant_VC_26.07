@@ -1,0 +1,477 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 달력</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "surface-container-high": "#eae7e7", "on-surface": "#1b1c1c", "on-surface-variant": "#45474a",
+                      "outline": "#76777b", "outline-variant": "#c6c6ca", "primary": "#5d5e62", "on-primary": "#ffffff"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "display-serif": ["Noto Serif"], "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "display-serif": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>
+    body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }
+    .day-cell { aspect-ratio: 1 / 1.05; overflow: hidden; }
+    .day-cell .cell-menu, .week-cell .cell-menu { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset pt-section-margin pb-28">
+
+<header class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1; font-size: 26px;">restaurant</span>
+<span class="text-headline-lg font-headline-lg text-on-surface">우리집식당</span>
+</header>
+
+<!-- Month + legend -->
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant" aria-label="이전 달">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg text-on-surface px-1">2024년 8월</h1>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant" aria-label="다음 달">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<div class="flex items-center gap-3 font-label-sm text-label-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:#8a9a7b;"></span>김영희</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:#9b8ab5;"></span>박철수</span>
+</div>
+</div>
+
+<!-- 월/주/오늘 탭 -->
+<div class="flex bg-surface-container rounded-full p-1 mb-4 w-fit">
+<button id="tabMonth" class="view-tab px-4 py-1.5 rounded-full font-label-sm text-label-sm" onclick="setView('month')">월</button>
+<button id="tabWeek" class="view-tab px-4 py-1.5 rounded-full font-label-sm text-label-sm" onclick="setView('week')">주</button>
+<button id="tabToday" class="view-tab px-4 py-1.5 rounded-full font-label-sm text-label-sm" onclick="setView('today')">오늘</button>
+</div>
+
+<!-- 월 뷰 -->
+<div id="monthView">
+<div class="grid grid-cols-7 mb-1">
+<span class="text-center font-label-sm text-label-sm text-on-surface-variant py-1">일</span>
+<span class="text-center font-label-sm text-label-sm text-on-surface-variant py-1">월</span>
+<span class="text-center font-label-sm text-label-sm text-on-surface-variant py-1">화</span>
+<span class="text-center font-label-sm text-label-sm text-on-surface-variant py-1">수</span>
+<span class="text-center font-label-sm text-label-sm text-on-surface-variant py-1">목</span>
+<span class="text-center font-label-sm text-label-sm text-on-surface-variant py-1">금</span>
+<span class="text-center font-label-sm text-label-sm text-on-surface-variant py-1">토</span>
+</div>
+<!-- calGrid: 주 단위 그리드를 여러 개 쌓는 flex-col. 선택한 날짜가 있는 주 바로 아래로 dayDetail이 옮겨감(달력 맨 아래가 아니라). -->
+<div id="calGrid" class="flex flex-col gap-1 mb-3"></div>
+</div>
+
+<!-- 주 뷰 -->
+<div id="weekView" class="hidden mb-3">
+<div id="weekGrid" class="grid grid-cols-7 gap-1"></div>
+</div>
+
+<p id="hintLine" class="font-label-sm text-label-sm text-on-surface-variant text-center mb-4">색점 = 만든 사람 · 날짜를 누르면 그 줄 바로 아래에 그날 상세가 보여요</p>
+
+<!-- dayDetail이 매번 여기로 옮겨질 수 있게 남겨두는 자리(주/오늘 탭이거나 fallback일 때) -->
+<div id="dayDetailAnchor"></div>
+
+<!-- 그날 상세 (인라인, 팝업 없음) — 항상 이 노드 하나를 여러 위치로 옮겨가며 씀(내용 복제 없음).
+     주 그리드 사이에 끼워질 때 눈에 띄게 bg-surface-container로 배경을 줘서 "펼쳐진 줄"처럼 보이게 함. -->
+<div id="dayDetail" class="bg-surface-container rounded-xl p-4 my-1">
+<h2 id="dayDetailTitle" class="font-headline-lg text-headline-lg text-on-surface mb-3">8월 16일 (오늘)</h2>
+<div id="dayDetailBody" class="flex flex-col gap-3"></div>
+</div>
+
+</main>
+
+<nav class="fixed bottom-0 left-0 right-0 z-10 bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant" style="padding-bottom: env(safe-area-inset-bottom);">
+<div class="max-w-[600px] mx-auto flex items-stretch">
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../3-0. 홈/code.html'">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">홈</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../3-1. 내 식탁/code.html'">
+<span class="material-symbols-outlined">table_restaurant</span>
+<span class="font-label-sm text-label-sm">내 식탁</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<span class="font-label-sm text-label-sm">달력</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../7-1. 우리집 냉장고/code.html'">
+<span class="material-symbols-outlined">kitchen</span>
+<span class="font-label-sm text-label-sm">냉장고</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-on-surface-variant" onclick="window.location.href='../5-3. 설정/code.html'">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm text-label-sm">설정</span>
+</button>
+</div>
+</nav>
+
+<script>
+    var params = new URLSearchParams(window.location.search);
+    var CURRENT_PERSONA = params.get('as') || '김영희';
+
+    var TODAY = 16;
+
+    // 2024년 8월: 1일=목요일. 날짜별 실제 식사 데이터(요약+상세를 한곳에서).
+    var MEALS_BY_DATE = {
+        16: [
+            { color: '#8a9a7b', time: '저녁 · 19:00', type: '집밥', menu: '김치찌개 · 계란말이 · 나물무침', status: '함께 2명 · 확인 안 됨 1명' },
+            { color: '#9b8ab5', time: '야식 · 22:00', type: '배달', menu: '치킨', status: '함께 2명 · 박철수가 만듦' }
+        ],
+        17: [
+            { color: '#9b8ab5', time: '점심 · 12:30', type: '집밥', menu: '비빔국수 · 계란지단', status: '함께 1명 · 확인 안 됨 1명' }
+        ],
+        20: [
+            { color: '#8a9a7b', time: '점심 · 12:00', type: '집밥', menu: '된장찌개', status: '함께 2명' },
+            { color: '#8a9a7b', time: '저녁 · 18:30', type: '외식', menu: '파스타집', status: '함께 3명' }
+        ],
+        25: [
+            { color: '#9b8ab5', time: '저녁 · 19:00', type: '집밥', menu: '삼겹살 · 상추쌈', status: '함께 3명' }
+        ]
+    };
+
+    function mealSummary(day) {
+        var meals = MEALS_BY_DATE[day];
+        if (!meals || !meals.length) return null;
+        var first = meals[0];
+        var label = meals.length > 1 ? first.menu.split(' · ')[0] + ' 외 ' + (meals.length - 1) + '건' : first.menu;
+        return { color: first.color, menu: label };
+    }
+
+    // 앞뒤 달 날짜는 흐리게 표시. week: 그 날짜가 속한 주(일~토)를 표시.
+    var CELLS = [
+        {d:28,muted:true},{d:29,muted:true},{d:30,muted:true},{d:31,muted:true},{d:1},{d:2},{d:3},
+        {d:4},{d:5},{d:6},{d:7},{d:8},{d:9},{d:10},
+        {d:11},{d:12},{d:13},{d:14},{d:15},{d:16},{d:17},
+        {d:18},{d:19},{d:20},{d:21},{d:22},{d:23},{d:24},
+        {d:25},{d:26},{d:27},{d:28},{d:29},{d:30},{d:31},
+        {d:1,muted:true},{d:2,muted:true},{d:3,muted:true},{d:4,muted:true},{d:5,muted:true},{d:6,muted:true},{d:7,muted:true}
+    ];
+    var WEEK_OF_TODAY = [11, 12, 13, 14, 15, 16, 17];
+
+    var currentView = 'month';
+    var selectedDay = TODAY;
+    var dayDetailOpen = true; // 이미 펼쳐진 날짜를 다시 누르면 접히게(아코디언처럼)
+
+    function renderDayCell(cell, big) {
+        var el = document.createElement('button');
+        el.type = 'button';
+        var summary = cell.muted ? null : mealSummary(cell.d);
+        el.className = (big ? 'week-cell' : 'day-cell') + ' rounded-lg flex flex-col items-center justify-start pt-1.5 gap-1 ' +
+            (cell.muted ? 'text-outline' : 'text-on-surface bg-surface-container-lowest shadow-[0px_2px_6px_rgba(120,119,119,0.06)]') +
+            (!cell.muted && cell.d === TODAY ? ' ring-2 ring-primary' : '') +
+            (!cell.muted && cell.d === selectedDay ? ' bg-surface-container-high' : '');
+        el.innerHTML = '<span class="font-label-sm text-label-sm">' + cell.d + '</span>';
+        if (summary) {
+            var dot = document.createElement('span');
+            dot.className = 'w-1.5 h-1.5 rounded-full';
+            dot.style.background = summary.color;
+            el.appendChild(dot);
+            var menu = document.createElement('span');
+            menu.className = 'cell-menu font-label-sm text-on-surface-variant leading-tight text-center px-0.5';
+            menu.style.fontSize = big ? '10px' : '8px';
+            menu.textContent = summary.menu;
+            el.appendChild(menu);
+        }
+        if (!cell.muted) {
+            el.onclick = function () {
+                if (cell.d === selectedDay) { dayDetailOpen = !dayDetailOpen; }
+                else { selectedDay = cell.d; dayDetailOpen = true; }
+                renderAll();
+            };
+        }
+        return el;
+    }
+
+    // dayDetail은 DOM에 하나만 존재 — 내용을 복제하는 대신 이 노드를 필요한 자리로 옮겨서(re-parent)
+    // "선택한 날짜 바로 아래"에 보이게 한다(달력 전체 맨 아래가 아니라).
+    function placeDayDetail(afterEl) {
+        var detail = document.getElementById('dayDetail');
+        afterEl.parentNode.insertBefore(detail, afterEl.nextSibling);
+    }
+
+    function renderMonthGrid() {
+        // container.innerHTML='' 직전에 dayDetail을 안전한 자리(anchor)로 먼저 빼둠 —
+        // 지난 렌더에서 dayDetail이 이 container 안으로 옮겨져 있었다면, innerHTML=''가 그 노드 자체를 지워버리는 버그가 있었음.
+        placeDayDetail(document.getElementById('dayDetailAnchor'));
+        var container = document.getElementById('calGrid');
+        container.innerHTML = '';
+        var selectedWeekRow = null;
+        for (var i = 0; i < CELLS.length; i += 7) {
+            var week = CELLS.slice(i, i + 7);
+            var weekRow = document.createElement('div');
+            weekRow.className = 'grid grid-cols-7 gap-1';
+            week.forEach(function (cell) { weekRow.appendChild(renderDayCell(cell, false)); });
+            container.appendChild(weekRow);
+            if (week.some(function (cell) { return !cell.muted && cell.d === selectedDay; })) { selectedWeekRow = weekRow; }
+        }
+        placeDayDetail(selectedWeekRow || container);
+    }
+
+    function renderWeekGrid() {
+        placeDayDetail(document.getElementById('dayDetailAnchor'));
+        var grid = document.getElementById('weekGrid');
+        grid.innerHTML = '';
+        WEEK_OF_TODAY.forEach(function (d) { grid.appendChild(renderDayCell({ d: d }, true)); });
+        placeDayDetail(grid);
+    }
+
+    // 미리 답해두기: 원래 홈 화면에 5일치를 한 줄로 늘어놓고 체크/X 아이콘만 보여줬더니
+    // "협박같고 보기 안 좋다"는 지적 + "이건 날짜 기능이니 달력에 있어야 하지 않냐"는 지적을 받아 이곳으로 옮김.
+    // 달력에서 날짜 하나씩, 문장으로 묻는 방식이라 다섯 개를 한꺼번에 들이미는 느낌이 없음.
+    function toDateKey(d) {
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    // 이 화면의 달력은 데모용 고정 날짜(2024년 8월, TODAY=16)라 실제 오늘 날짜와 다를 수 있음 —
+    // "선택한 날 - TODAY" 차이만큼 실제 오늘에서 이동시켜서, 홈(3-0)·식사 만들기(3-2)가 쓰는
+    // 진짜 날짜 기준 advance_answers 저장소와 같은 키 형식으로 맞춤.
+    function selectedRealDate() {
+        var d = new Date();
+        d.setDate(d.getDate() + (selectedDay - TODAY));
+        return d;
+    }
+    function selectedRealDateKey() { return toDateKey(selectedRealDate()); }
+
+    function loadAdvanceAnswers() {
+        var answers = [];
+        try { answers = JSON.parse(localStorage.getItem('advance_answers') || '[]'); } catch (err) {}
+        return answers;
+    }
+
+    // 지난 날짜에도 한마디를 남길 수 있게 — 달력이 "그날의 한마디"를 보여주기만 하고 남기는 건 홈(오늘만)에서만 되던 빈틈을 메움.
+    function addNoteForSelectedDay() {
+        var message = prompt('이 날에 대해 한마디 남길까요?');
+        if (!message || !message.trim()) return;
+        var notes = [];
+        try { notes = JSON.parse(localStorage.getItem('guestbook_notes') || '[]'); } catch (err) {}
+        notes.push({ id: 'note' + Date.now() + Math.random().toString(36).slice(2, 6), name: CURRENT_PERSONA, message: message.trim(), day: selectedRealDateKey() });
+        try { localStorage.setItem('guestbook_notes', JSON.stringify(notes)); } catch (err) {}
+        renderDayDetail();
+    }
+
+    function removeNoteAt(index) {
+        // 잘못 눌렀을 수도, 수정하려던 걸 수도 있으니 지우기 전에 한 번 확인.
+        if (!confirm('이 한마디를 지울까요? 되돌릴 수 없어요.')) return;
+        var notes = [];
+        try { notes = JSON.parse(localStorage.getItem('guestbook_notes') || '[]'); } catch (err) {}
+        notes.splice(index, 1);
+        try { localStorage.setItem('guestbook_notes', JSON.stringify(notes)); } catch (err) {}
+        renderDayDetail();
+    }
+
+    // 이 날의 "요일별 기본 응답"(5-4)이 있으면 그걸 기준으로 보여주고, 여긴 그 요일 기본값에 대한 "예외"만 물어봄 —
+    // 두 기능이 따로 놀지 않게(요일별 기본이 없으면 null 반환해서 기존처럼 처음부터 물어봄).
+    function weekdayDefaultFor(persona, date) {
+        var saved = [];
+        try { saved = JSON.parse(localStorage.getItem('weekday_defaults') || '[]'); } catch (err) {}
+        var mine = saved.find(function (m) { return m.name === persona; });
+        if (!mine || !mine.defaults) return null;
+        var idx = (date.getDay() + 6) % 7; // 0=월 ... 6=일, 5-4의 DAYS 순서와 동일
+        var state = mine.defaults[idx];
+        return (!state || state === 'unset') ? null : state; // 'on' | 'off' | null
+    }
+
+    function setAdvanceAnswer(status) {
+        var dateKey = selectedRealDateKey();
+        var answers = loadAdvanceAnswers().filter(function (a) { return !(a.name === CURRENT_PERSONA && a.date === dateKey); });
+        answers.push({ name: CURRENT_PERSONA, date: dateKey, status: status });
+        try { localStorage.setItem('advance_answers', JSON.stringify(answers)); } catch (err) {}
+        renderDayDetail();
+    }
+
+    function renderAdvancePrompt() {
+        var dateKey = selectedRealDateKey();
+        var existing = loadAdvanceAnswers().find(function (a) { return a.name === CURRENT_PERSONA && a.date === dateKey; });
+        var wrap = document.createElement('div');
+        wrap.className = 'text-center';
+
+        if (existing) {
+            var statusLabel = existing.status === 'attending' ? '먹어요' : '안 먹어요';
+            wrap.innerHTML =
+                '<p class="font-label-sm text-label-sm text-on-surface-variant">✓ 미리 답해뒀어요 · <b class="text-on-surface">' + statusLabel + '</b></p>';
+            var changeBtn = document.createElement('button');
+            changeBtn.type = 'button';
+            changeBtn.className = 'font-label-sm text-label-sm text-primary mt-1';
+            changeBtn.textContent = '바꾸기';
+            changeBtn.onclick = function () { setAdvanceAnswer(existing.status === 'attending' ? 'absent' : 'attending'); };
+            wrap.appendChild(changeBtn);
+        } else {
+            var wd = weekdayDefaultFor(CURRENT_PERSONA, selectedRealDate()); // 'on' | 'off' | null
+            var btnRow = document.createElement('div');
+            btnRow.className = 'flex gap-2 justify-center';
+
+            if (wd) {
+                // 요일별 기본 응답(5-4)이 이미 있는 요일 — 여긴 새로 묻지 않고 "이 날만 예외인지"만 확인.
+                var wdLabel = wd === 'on' ? '참여' : '안 먹음';
+                var wdStatus = wd === 'on' ? 'attending' : 'absent';
+                var msg = document.createElement('p');
+                msg.className = 'font-body-md text-body-md text-on-surface mb-2';
+                msg.innerHTML = '이 요일은 평소 <b>' + wdLabel + '</b>로 답해뒀어요. 이 날은 다른가요?';
+                wrap.appendChild(msg);
+
+                var sameBtn = document.createElement('button');
+                sameBtn.type = 'button';
+                sameBtn.className = 'px-4 py-2 rounded-full bg-primary text-on-primary font-label-sm text-label-sm';
+                sameBtn.textContent = '네, 평소대로';
+                sameBtn.onclick = function () { setAdvanceAnswer(wdStatus); };
+
+                var diffBtn = document.createElement('button');
+                diffBtn.type = 'button';
+                diffBtn.className = 'px-4 py-2 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm';
+                diffBtn.textContent = '이 날은 다르게';
+                diffBtn.onclick = function () { setAdvanceAnswer(wdStatus === 'attending' ? 'absent' : 'attending'); };
+
+                btnRow.appendChild(sameBtn);
+                btnRow.appendChild(diffBtn);
+            } else {
+                // 요일별 기본 응답이 없는 요일 — 처음부터 직접 물어봄.
+                var msg2 = document.createElement('p');
+                msg2.className = 'font-body-md text-body-md text-on-surface mb-2';
+                msg2.textContent = '이 날 식사에 참여하시나요? 지금 답해두면 나중에 식사를 만들 때 자동으로 반영돼요.';
+                wrap.appendChild(msg2);
+
+                var noBtn = document.createElement('button');
+                noBtn.type = 'button';
+                noBtn.className = 'px-4 py-2 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm';
+                noBtn.textContent = '안 먹어요';
+                noBtn.onclick = function () { setAdvanceAnswer('absent'); };
+                var yesBtn = document.createElement('button');
+                yesBtn.type = 'button';
+                yesBtn.className = 'px-4 py-2 rounded-full bg-primary text-on-primary font-label-sm text-label-sm';
+                yesBtn.textContent = '네, 먹어요';
+                yesBtn.onclick = function () { setAdvanceAnswer('attending'); };
+                btnRow.appendChild(noBtn);
+                btnRow.appendChild(yesBtn);
+            }
+            wrap.appendChild(btnRow);
+        }
+        return wrap;
+    }
+
+    function renderDayDetail() {
+        var isToday = selectedDay === TODAY;
+        document.getElementById('dayDetailTitle').textContent = '8월 ' + selectedDay + '일' + (isToday ? ' (오늘)' : '');
+
+        var body = document.getElementById('dayDetailBody');
+        body.innerHTML = '';
+        var meals = MEALS_BY_DATE[selectedDay];
+
+        if (!meals || !meals.length) {
+            var emptyCard = document.createElement('div');
+            emptyCard.className = 'rounded-xl bg-surface-container-lowest shadow-[0px_2px_8px_rgba(120,119,119,0.06)] p-4 flex flex-col gap-3';
+            var empty = document.createElement('p');
+            empty.className = 'font-label-sm text-label-sm text-on-surface-variant text-center';
+            empty.textContent = '이 날은 계획된 식사가 없어요.';
+            emptyCard.appendChild(empty);
+            if (selectedDay >= TODAY) { emptyCard.appendChild(renderAdvancePrompt()); }
+            body.appendChild(emptyCard);
+        } else {
+            meals.forEach(function (m) {
+                var card = document.createElement('article');
+                card.className = 'rounded-xl bg-surface-container-lowest shadow-[0px_2px_8px_rgba(120,119,119,0.06)] p-4';
+                card.style.borderLeft = '4px solid ' + m.color;
+                card.innerHTML =
+                    '<div class="flex items-center gap-2 mb-1.5">' +
+                    '<span class="font-label-sm text-label-sm text-on-surface-variant">' + m.time + '</span>' +
+                    '<span class="font-label-sm text-label-sm bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full">' + m.type + '</span>' +
+                    '</div>' +
+                    '<h3 class="font-headline-lg text-headline-lg text-on-surface mb-1">' + m.menu + '</h3>' +
+                    '<p class="font-label-sm text-label-sm text-on-surface-variant">' + m.status + '</p>';
+                body.appendChild(card);
+            });
+        }
+
+        // 그날의 한마디(방명록) — 홈에서 남긴 메시지가 그날 지나면 사라지지 않고 여기서 계속 다시 보임(가족 기록장).
+        var notes = [];
+        try { notes = JSON.parse(localStorage.getItem('guestbook_notes') || '[]'); } catch (err) {}
+        var dayNotes = notes.filter(function (n) { return n.day === selectedRealDateKey(); });
+        if (dayNotes.length) {
+            var notesWrap = document.createElement('div');
+            var notesTitle = document.createElement('p');
+            notesTitle.className = 'font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-2';
+            notesTitle.textContent = '그날의 한마디';
+            notesWrap.appendChild(notesTitle);
+
+            var notesRow = document.createElement('div');
+            notesRow.className = 'flex flex-wrap gap-2';
+            // 엑셀 셀 메모처럼 — 옅은 노란 포스트잇 느낌(살짝 기울여서 진짜 붙여둔 쪽지처럼).
+            dayNotes.forEach(function (n, i) {
+                var originalIndex = notes.indexOf(n); // 내 것만 지울 수 있게(전체 배열에서의 실제 위치)
+                var note = document.createElement('div');
+                note.className = 'px-3 py-2 rounded-sm';
+                note.style.background = '#fff6d6';
+                note.style.border = '1px solid #ecdc9c';
+                note.style.boxShadow = '2px 2px 4px rgba(120,119,119,0.15)';
+                note.style.maxWidth = '150px';
+                note.style.transform = 'rotate(' + (i % 2 === 0 ? '-1.5deg' : '1.5deg') + ')';
+                note.innerHTML =
+                    '<div class="flex items-start justify-between gap-1">' +
+                    '<p class="font-label-sm text-label-sm font-semibold mb-0.5" style="color:#5c4a1a;">' + n.name + '</p>' +
+                    (n.name === CURRENT_PERSONA ? '<button type="button" class="remove-note-btn font-label-sm text-label-sm shrink-0" style="color:#8a7530;">×</button>' : '') +
+                    '</div>' +
+                    '<p class="font-label-sm text-label-sm" style="color:#6b5a2a;">' + n.message + '</p>';
+                var removeBtn = note.querySelector('.remove-note-btn');
+                if (removeBtn) { removeBtn.onclick = function () { removeNoteAt(originalIndex); }; }
+                notesRow.appendChild(note);
+            });
+            notesWrap.appendChild(notesRow);
+            body.appendChild(notesWrap);
+        }
+
+        var addNoteBtn = document.createElement('button');
+        addNoteBtn.type = 'button';
+        addNoteBtn.className = 'w-full py-2.5 rounded-xl border border-dashed border-outline-variant text-on-surface-variant font-label-sm text-label-sm flex items-center justify-center gap-2';
+        addNoteBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">add_comment</span>이 날 한마디 남기기';
+        addNoteBtn.onclick = function () { addNoteForSelectedDay(); };
+        body.appendChild(addNoteBtn);
+
+        var addBtn = document.createElement('button');
+        addBtn.className = 'w-full py-3 rounded-xl border border-dashed border-outline-variant text-on-surface-variant font-label-sm text-label-sm flex items-center justify-center gap-2';
+        addBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">add</span>이 날 식사 추가';
+        addBtn.onclick = function () { window.location.href = '../3-2. 식사 만들기/code.html'; };
+        body.appendChild(addBtn);
+    }
+
+    function setView(view) {
+        currentView = view;
+        if (view === 'week' || view === 'today') { selectedDay = TODAY; }
+        dayDetailOpen = true;
+
+        document.querySelectorAll('.view-tab').forEach(function (btn) { btn.classList.remove('bg-primary', 'text-on-primary'); btn.classList.add('text-on-surface-variant'); });
+        document.getElementById(view === 'month' ? 'tabMonth' : view === 'week' ? 'tabWeek' : 'tabToday').classList.add('bg-primary', 'text-on-primary');
+        document.getElementById(view === 'month' ? 'tabMonth' : view === 'week' ? 'tabWeek' : 'tabToday').classList.remove('text-on-surface-variant');
+
+        document.getElementById('monthView').classList.toggle('hidden', view !== 'month');
+        document.getElementById('weekView').classList.toggle('hidden', view !== 'week');
+        document.getElementById('hintLine').classList.toggle('hidden', view === 'today');
+
+        renderAll();
+    }
+
+    function renderAll() {
+        if (currentView === 'month') renderMonthGrid();
+        else if (currentView === 'week') renderWeekGrid();
+        else placeDayDetail(document.getElementById('dayDetailAnchor'));
+        renderDayDetail();
+        document.getElementById('dayDetail').classList.toggle('hidden', !dayDetailOpen);
+    }
+
+    setView('month');
+</script>
+</body></html>

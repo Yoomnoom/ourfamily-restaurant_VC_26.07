@@ -1,0 +1,121 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 메뉴 추천</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff", "tertiary-container": "#fef4e9", "on-tertiary-container": "#766f66"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bg-on-surface text-surface font-label-sm text-label-sm px-4 py-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300" style="bottom:24px; z-index:100;"></div>
+
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset py-section-margin">
+
+<header class="flex items-center gap-3 mb-6">
+<button class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-95 transition-transform" onclick="window.location.href='../3-2. 식사 만들기/code.html'" aria-label="뒤로">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">냉장고 재료로 메뉴 추천</h1>
+</header>
+
+<p id="fridgeSummary" class="font-body-md text-body-md text-on-surface-variant mb-4"></p>
+
+<div id="recipeList" class="flex flex-col gap-3"></div>
+
+</main>
+
+<script>
+    var toastTimer;
+    function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.remove('opacity-0');
+        toast.classList.add('opacity-100');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('opacity-100'); toast.classList.add('opacity-0'); }, 2600);
+    }
+
+    var RECIPES = [
+        { name: '감자볶음', emoji: '🍳', time: '15분', needs: ['감자', '양파', '대파', '당근'] },
+        { name: '오믈렛', emoji: '🍳', time: '20분', needs: ['계란', '양파', '치즈'] },
+        { name: '된장찌개', emoji: '🍲', time: '30분', needs: ['감자', '양파', '버섯', '대파'] },
+        { name: '크림파스타', emoji: '🍝', time: '25분', needs: ['우유', '치즈', '버섯'] }
+    ];
+
+    var fridge = [];
+    try { fridge = JSON.parse(localStorage.getItem('household_fridge') || '[]'); } catch (err) {}
+    var fridgeNames = fridge.map(function (f) { return f.name; });
+
+    document.getElementById('fridgeSummary').textContent = '지금 냉장고에 있는 재료 ' + fridgeNames.length + '가지를 기준으로 추천했어요.';
+
+    var scored = RECIPES.map(function (r) {
+        var owned = r.needs.filter(function (n) { return fridgeNames.indexOf(n) !== -1; });
+        var match = Math.round((owned.length / r.needs.length) * 100);
+        return { recipe: r, owned: owned, match: match };
+    }).sort(function (a, b) { return b.match - a.match; });
+
+    var list = document.getElementById('recipeList');
+    scored.forEach(function (s, i) {
+        var card = document.createElement('article');
+        card.className = 'bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)]';
+
+        var needsHtml = s.recipe.needs.map(function (n) {
+            var has = s.owned.indexOf(n) !== -1;
+            return '<span class="font-label-sm text-label-sm px-2 py-1 rounded-full ' + (has ? 'bg-tertiary-container text-on-tertiary-container' : 'bg-surface-container text-on-surface-variant') + '">' + n + '</span>';
+        }).join(' ');
+
+        card.innerHTML =
+            '<div class="flex items-center gap-3 mb-3">' +
+            '<span class="text-3xl">' + s.recipe.emoji + '</span>' +
+            '<div class="flex-1">' +
+            '<div class="flex items-center gap-2">' +
+            '<h2 class="font-headline-lg text-headline-lg text-on-surface">' + s.recipe.name + '</h2>' +
+            (i === 0 ? '<span class="font-label-sm text-label-sm bg-primary text-on-primary px-2 py-0.5 rounded-full">BEST</span>' : '') +
+            '</div>' +
+            '<p class="font-label-sm text-label-sm text-on-surface-variant">' + s.recipe.time + ' · 보유 재료 ' + s.match + '%</p>' +
+            '</div>' +
+            '</div>' +
+            '<div class="flex flex-wrap gap-1.5 mb-3">' + needsHtml + '</div>' +
+            '<button type="button" class="pick-btn w-full py-2.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm active:scale-[0.98] transition-transform mb-2">이 메뉴로 정하기</button>' +
+            (s.match < 100
+                ? '<button type="button" class="milkit-btn w-full flex items-center justify-center gap-1.5 py-2 rounded-full border border-dashed border-outline-variant text-on-surface-variant font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px]">local_shipping</span>부족한 재료 ' + (s.recipe.needs.length - s.owned.length) + '개, 밀키트로 준비하기</button>'
+                : '');
+
+        card.querySelector('.pick-btn').onclick = function () { pickRecipe(s.recipe); };
+        var milkitBtn = card.querySelector('.milkit-btn');
+        if (milkitBtn) {
+            milkitBtn.onclick = function () {
+                var missing = s.recipe.needs.filter(function (n) { return s.owned.indexOf(n) === -1; });
+                try { localStorage.setItem('milkit_order', JSON.stringify({ recipeName: s.recipe.name, missing: missing })); } catch (err) {}
+                window.location.href = '../8-1. 밀키트 주문/code.html';
+            };
+        }
+        list.appendChild(card);
+    });
+
+    function pickRecipe(recipe) {
+        try { localStorage.setItem('recipe_pick', JSON.stringify(recipe)); } catch (err) {}
+        window.location.href = '../3-2. 식사 만들기/code.html';
+    }
+</script>
+</body></html>

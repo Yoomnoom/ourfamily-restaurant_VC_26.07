@@ -1,0 +1,188 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 가구 설정</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: {
+              "colors": {
+                      "surface": "#fbf9f8", "surface-container-lowest": "#ffffff", "surface-container": "#f0eded",
+                      "on-surface": "#1b1c1c", "on-surface-variant": "#45474a", "outline-variant": "#c6c6ca",
+                      "primary": "#5d5e62", "on-primary": "#ffffff", "secondary-container": "#e3e2e3", "on-secondary-container": "#646465",
+                      "error": "#ba1a1a"
+              },
+              "spacing": { "section-margin": "2rem", "card-padding": "1.25rem", "safe-area-inset": "1rem", "stack-gap": "1rem" },
+              "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"] },
+              "fontSize": {
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      } } }
+      </script>
+<style>body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }</style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bg-on-surface text-surface font-label-sm text-label-sm px-4 py-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300" style="bottom:24px; z-index:100;"></div>
+
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset py-section-margin">
+
+<header class="flex items-center gap-3 mb-6">
+<button class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-95 transition-transform" onclick="window.location.href='../3-0. 홈/code.html'" aria-label="뒤로">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">가구</h1>
+</header>
+
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-5 px-1">우리 집 식사와 가구를 관리해요. 아래 4가지로 나뉘어 있어요.</p>
+
+<!-- ① 가구 정보 -->
+<section class="mb-6">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">① 가구 정보</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-3">구성원, 공동 관리자, 가구 삭제</p>
+<div id="memberList" class="flex flex-col gap-2 mb-3"></div>
+<button type="button" class="w-full py-2.5 rounded-xl border border-dashed border-outline-variant text-on-surface-variant font-label-sm text-label-sm mb-3" onclick="showToast('가구 초대 링크 생성은 실제 서비스에서 연동돼요.')">+ 구성원 초대</button>
+<button type="button" class="w-full text-center font-label-sm text-label-sm text-error py-2" onclick="if(confirm('가구를 삭제하면 되돌릴 수 없어요. 정말 삭제할까요?')) showToast('가구 삭제는 실제 서비스에서 연동돼요.')">가구 삭제 (오너만 가능)</button>
+</section>
+
+<!-- ② 요일별 기본 응답 -->
+<section class="mb-6">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">② 요일별 기본 응답</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-3">묻기 전에 미리 정해두는 요일별 참여 기본값</p>
+<button type="button" class="w-full flex items-center gap-3 bg-surface-container-lowest rounded-xl px-4 py-4 shadow-[0px_4px_12px_rgba(120,119,119,0.08)]" onclick="window.location.href='../5-4. 요일별 기본 응답/code.html'">
+<span class="material-symbols-outlined text-primary">event_repeat</span>
+<span class="font-body-md text-body-md text-on-surface flex-1 text-left">요일별 기본 응답 설정하기</span>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</button>
+</section>
+
+<!-- ③ 손님 · 수신 동의 -->
+<section class="mb-6">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">③ 손님 · 수신 동의</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-3">자주 오는 손님을 저장해두고, 알림 수신 동의를 관리해요 (수신 동의 관리는 준비 중)</p>
+<div id="guestList" class="flex flex-col gap-2 mb-3"></div>
+<div class="flex gap-2">
+<input id="guestInput" type="text" placeholder="손님 이름" class="flex-1 min-w-0 border border-outline-variant rounded-lg px-3 py-2.5 font-body-md text-body-md bg-surface-container-lowest" onkeydown="if(event.key==='Enter'){event.preventDefault();addGuest();}">
+<button type="button" class="px-4 rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-label-sm" onclick="addGuest()">+ 손님</button>
+</div>
+</section>
+
+<!-- ④ 정산 관리 -->
+<section class="mb-6">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">④ 정산 관리</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-3">함께 낸 비용을 나누고 확인해요</p>
+<button type="button" class="w-full flex items-center gap-3 bg-surface-container-lowest rounded-xl px-4 py-4 shadow-[0px_4px_12px_rgba(120,119,119,0.08)]" onclick="window.location.href='../8-4. 정산/code.html'">
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+<span class="font-body-md text-body-md text-on-surface flex-1 text-left">정산 보기</span>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</button>
+</section>
+
+</main>
+
+<script>
+    var toastTimer;
+    function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.remove('opacity-0');
+        toast.classList.add('opacity-100');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('opacity-100'); toast.classList.add('opacity-0'); }, 2600);
+    }
+
+    function renderMembers() {
+        var members = [];
+        try { members = JSON.parse(localStorage.getItem('onboarding_members') || '[]'); } catch (err) {}
+        if (!members.length) {
+            members = [
+                { name: '김영희', color: '#8a9a7b', isMe: true },
+                { name: '박철수', color: '#9b8ab5' },
+                { name: '이지은', color: '#c98a5a' }
+            ];
+        }
+        var list = document.getElementById('memberList');
+        list.innerHTML = '';
+        var coAdmins = [];
+        try { coAdmins = JSON.parse(localStorage.getItem('co_admins') || '[]'); } catch (err) {}
+
+        var myPhoto = null;
+        try { myPhoto = localStorage.getItem('onboarding_profile_photo'); } catch (err) {}
+
+        members.forEach(function (m) {
+            var isOwner = m.isMe; // 이 목업에서 온보딩한 사람(나) = 오너
+            var isCoAdmin = coAdmins.indexOf(m.name) !== -1;
+            var row = document.createElement('div');
+            row.className = 'bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_12px_rgba(120,119,119,0.08)] flex items-center gap-3';
+            var avatarHtml = (m.isMe && myPhoto)
+                ? '<img src="' + myPhoto + '" class="w-8 h-8 rounded-full object-cover shrink-0">'
+                : '<span class="w-8 h-8 rounded-full flex items-center justify-center text-on-primary font-label-sm text-label-sm shrink-0" style="background-color:' + (m.color || '#8a9a7b') + ';">' + (m.name || '?').trim().charAt(0) + '</span>';
+            row.innerHTML =
+                avatarHtml +
+                '<span class="font-body-md text-body-md text-on-surface flex-1">' + (m.name || '') + (m.isMe ? ' (나)' : '') + (isCoAdmin ? ' · 공동 관리자' : '') + '</span>';
+            // 오너만 다른 구성원을 공동 관리자로 지정/해제할 수 있음 — 나머지 구성원엔 아무 표시도 안 함(위계 강조 안 함).
+            if (!isOwner) {
+                var toggleBtn = document.createElement('button');
+                toggleBtn.type = 'button';
+                toggleBtn.className = 'font-label-sm text-label-sm text-primary shrink-0';
+                toggleBtn.textContent = isCoAdmin ? '해제' : '공동 관리자로';
+                toggleBtn.onclick = function () { toggleCoAdmin(m.name); };
+                row.appendChild(toggleBtn);
+            }
+            list.appendChild(row);
+        });
+    }
+
+    function toggleCoAdmin(name) {
+        var coAdmins = [];
+        try { coAdmins = JSON.parse(localStorage.getItem('co_admins') || '[]'); } catch (err) {}
+        var idx = coAdmins.indexOf(name);
+        if (idx === -1) { coAdmins.push(name); showToast(name + '님을 공동 관리자로 지정했어요'); }
+        else { coAdmins.splice(idx, 1); showToast(name + '님의 공동 관리자를 해제했어요'); }
+        try { localStorage.setItem('co_admins', JSON.stringify(coAdmins)); } catch (err) {}
+        renderMembers();
+    }
+
+    function addGuest() {
+        var input = document.getElementById('guestInput');
+        var name = input.value.trim();
+        if (!name) return;
+        var guests = [];
+        try { guests = JSON.parse(localStorage.getItem('saved_guests') || '[]'); } catch (err) {}
+        guests.push({ name: name, visits: 0 });
+        try { localStorage.setItem('saved_guests', JSON.stringify(guests)); } catch (err) {}
+        input.value = '';
+        renderGuests();
+    }
+
+    function renderGuests() {
+        var guests = [];
+        try { guests = JSON.parse(localStorage.getItem('saved_guests') || '[]'); } catch (err) {}
+        var list = document.getElementById('guestList');
+        list.innerHTML = '';
+        if (!guests.length) {
+            var empty = document.createElement('p');
+            empty.className = 'font-label-sm text-label-sm text-on-surface-variant px-1';
+            empty.textContent = '아직 저장된 손님이 없어요.';
+            list.appendChild(empty);
+            return;
+        }
+        guests.forEach(function (g) {
+            var row = document.createElement('div');
+            row.className = 'bg-surface-container-lowest rounded-xl px-4 py-3 shadow-[0px_4px_12px_rgba(120,119,119,0.08)] flex items-center justify-between';
+            row.innerHTML =
+                '<span class="font-body-md text-body-md text-on-surface">' + g.name + '</span>' +
+                '<span class="font-label-sm text-label-sm text-on-surface-variant">방문 ' + (g.visits || 0) + '회</span>';
+            list.appendChild(row);
+        });
+    }
+
+    renderMembers();
+    renderGuests();
+</script>
+</body></html>

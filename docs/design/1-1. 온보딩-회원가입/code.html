@@ -1,0 +1,464 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>우리집식당 - 회원가입</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f6f3f3",
+                      "on-error-container": "#93000a",
+                      "on-secondary": "#ffffff",
+                      "surface-variant": "#e4e2e2",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#e3e2e3",
+                      "surface-container": "#f0eded",
+                      "on-secondary-fixed-variant": "#464748",
+                      "on-error": "#ffffff",
+                      "outline-variant": "#c6c6ca",
+                      "on-tertiary-fixed-variant": "#4b463e",
+                      "on-surface-variant": "#45474a",
+                      "tertiary-fixed-dim": "#cec5bb",
+                      "outline": "#76777b",
+                      "on-primary-container": "#6f7074",
+                      "on-secondary-fixed": "#1b1c1d",
+                      "error-container": "#ffdad6",
+                      "on-primary-fixed": "#1a1c1f",
+                      "inverse-surface": "#303030",
+                      "on-surface": "#1b1c1c",
+                      "secondary-fixed-dim": "#c7c6c7",
+                      "inverse-primary": "#5d5e62",
+                      "secondary-fixed": "#e3e2e3",
+                      "tertiary-fixed": "#ebe1d6",
+                      "error": "#ba1a1a",
+                      "inverse-on-surface": "#f3f0f0",
+                      "surface": "#fbf9f8",
+                      "on-tertiary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#eae7e7",
+                      "tertiary": "#645d55",
+                      "primary": "#5d5e62",
+                      "on-tertiary-container": "#766f66",
+                      "primary-fixed": "#e2e2e6",
+                      "tertiary-container": "#fef4e9",
+                      "primary-container": "#f5f5f9",
+                      "surface-dim": "#dcd9d9",
+                      "surface-container-highest": "#e4e2e2",
+                      "on-secondary-container": "#646465",
+                      "primary-fixed-dim": "#c6c6ca",
+                      "surface-tint": "#5d5e62",
+                      "background": "#fbf9f8",
+                      "secondary": "#5e5e5f",
+                      "on-primary-fixed-variant": "#45474a",
+                      "surface-bright": "#fbf9f8",
+                      "on-background": "#1b1c1c",
+                      "on-tertiary-fixed": "#1f1b15"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-margin": "2rem",
+                      "card-padding": "1.25rem",
+                      "safe-area-inset": "1rem",
+                      "stack-gap": "1rem"
+              },
+              "fontFamily": {
+                      "body-md": ["Plus Jakarta Sans"],
+                      "display-serif": ["Noto Serif"],
+                      "emotional-quote": ["Noto Serif"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "label-sm": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "display-serif": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                      "emotional-quote": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                      "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+    body { min-height: max(884px, 100dvh); -webkit-tap-highlight-color: transparent; }
+
+    /* 프로필 이미지 크롭 모달 (수업17일차_회원관리 signup.js 로직 재사용) */
+    .crop-modal { position: fixed; inset: 0; background: rgba(27,28,28,0.55); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+    .crop-modal[hidden] { display: none; }
+    .crop-modal-content { background: #ffffff; border-radius: 16px; padding: 24px; width: 100%; max-width: 340px; text-align: center; }
+    .crop-stage { position: relative; width: 220px; height: 220px; margin: 0 auto 16px; border-radius: 50%; overflow: hidden; background: #211a2e; cursor: grab; touch-action: none; }
+    .crop-stage.dragging { cursor: grabbing; }
+    .crop-image { position: absolute; left: 0; top: 0; max-width: none; user-select: none; pointer-events: none; }
+    #crop-zoom { width: 100%; margin-bottom: 20px; }
+    .spinner { width: 14px; height: 14px; border: 2px solid #ded3ef; border-top-color: #6d5a92; border-radius: 50%; display: inline-block; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col items-center">
+<main class="w-full max-w-[600px] flex flex-col px-safe-area-inset py-section-margin relative">
+
+<!-- Header: Step Progress (no back — first step) -->
+<header class="flex items-center gap-3 z-10 w-full mb-6">
+<div class="flex-1">
+<div class="text-right font-label-sm text-label-sm text-on-surface-variant mb-1">1/4단계</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden flex gap-1 p-0.5">
+<div class="flex-1 h-full bg-primary rounded-full"></div>
+<div class="flex-1 h-full bg-surface-container-highest rounded-full"></div>
+<div class="flex-1 h-full bg-surface-container-highest rounded-full"></div>
+<div class="flex-1 h-full bg-surface-container-highest rounded-full"></div>
+</div>
+</div>
+</header>
+
+<div class="flex flex-col z-10">
+<div class="mb-6 text-center">
+<h1 class="font-display-serif text-display-serif text-primary mb-1">회원가입</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">우리집식당을 시작하려면 계정을 만들어주세요.</p>
+</div>
+
+<form id="signup-form" class="flex flex-col gap-6" novalidate onsubmit="event.preventDefault();">
+
+<!-- 프로필 이미지 -->
+<div class="flex flex-col items-center gap-2">
+<label class="relative w-24 h-24 cursor-pointer" for="profile-image">
+<img id="profile-preview" class="w-24 h-24 rounded-full object-cover border border-outline-variant bg-surface-container-low" src="https://placehold.co/120x120?text=Profile">
+<span class="absolute inset-0 rounded-full bg-on-surface/0 hover:bg-on-surface/40 text-transparent hover:text-on-primary flex items-center justify-center font-label-sm text-label-sm transition-colors">이미지 선택</span>
+<span class="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-[0px_2px_6px_rgba(0,0,0,0.2)] pointer-events-none">
+<span class="material-symbols-outlined" style="font-size:14px">photo_camera</span>
+</span>
+</label>
+<input type="file" id="profile-image" accept="image/*" class="hidden">
+</div>
+
+<!-- 이름 -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="name">이름 <span class="text-error">*</span></label>
+<input class="w-full bg-transparent border-0 border-b border-surface-container-high focus:border-primary focus:ring-0 px-0 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline-variant transition-colors" id="name" placeholder="이름을 입력하세요" type="text">
+<p class="font-label-sm text-label-sm text-error" id="name-error"></p>
+</div>
+
+<!-- 이메일 -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="email">이메일 <span class="text-error">*</span></label>
+<input class="w-full bg-transparent border-0 border-b border-surface-container-high focus:border-primary focus:ring-0 px-0 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline-variant transition-colors" id="email" placeholder="example@email.com" type="email">
+<p class="font-label-sm text-label-sm text-error" id="email-error"></p>
+</div>
+
+<!-- 비밀번호 -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="password">비밀번호 <span class="text-error">*</span></label>
+<div class="flex items-center gap-2 border-b border-surface-container-high focus-within:border-primary transition-colors">
+<input class="flex-1 bg-transparent border-0 focus:ring-0 px-0 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline-variant" id="password" placeholder="8자 이상 입력하세요" type="password">
+<button type="button" class="toggle-password w-11 h-11 flex items-center justify-center text-on-surface-variant text-lg shrink-0" data-target="password">👁</button>
+</div>
+<p class="font-label-sm text-label-sm text-error" id="password-error"></p>
+</div>
+
+<!-- 비밀번호 확인 -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="password-confirm">비밀번호 확인 <span class="text-error">*</span></label>
+<div class="flex items-center gap-2 border-b border-surface-container-high focus-within:border-primary transition-colors">
+<input class="flex-1 bg-transparent border-0 focus:ring-0 px-0 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline-variant" id="password-confirm" placeholder="비밀번호를 다시 입력하세요" type="password">
+<button type="button" class="toggle-password w-11 h-11 flex items-center justify-center text-on-surface-variant text-lg shrink-0" data-target="password-confirm">👁</button>
+</div>
+<p class="font-label-sm text-label-sm text-error" id="password-confirm-error"></p>
+</div>
+
+<!-- 전화번호 -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="phone">전화번호</label>
+<input class="w-full bg-transparent border-0 border-b border-surface-container-high focus:border-primary focus:ring-0 px-0 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline-variant transition-colors" id="phone" placeholder="010-1234-5678" type="text">
+<p class="font-label-sm text-label-sm text-error" id="phone-error"></p>
+</div>
+
+<!-- 주소 -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="address">주소</label>
+<input class="w-full bg-transparent border-0 border-b border-surface-container-high focus:border-primary focus:ring-0 px-0 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline-variant transition-colors" id="address" placeholder="주소를 입력하세요" type="text">
+</div>
+
+<p class="text-center font-label-sm text-label-sm min-h-[18px]" id="form-message"></p>
+
+<div class="hidden items-center justify-center gap-2 font-label-sm text-label-sm text-primary" id="loading">
+<span class="spinner"></span> 처리 중입니다...
+</div>
+
+<!-- Actions -->
+<div class="mt-2 pt-4 pb-safe-area-inset flex flex-col gap-3">
+<div class="flex gap-2">
+<button class="flex-1 py-4 rounded-full bg-surface-container-high text-on-surface font-label-sm text-[15px] active:scale-95 transition-transform" id="reset-btn" type="reset">초기화</button>
+<button class="flex-[2] bg-primary text-on-primary font-label-sm text-[15px] py-4 rounded-full shadow-[0px_4px_12px_rgba(120,119,119,0.08)] active:scale-[0.98] transition-transform flex items-center justify-center gap-2" id="signup-btn" type="submit">
+<span>회원가입</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<button class="w-full py-2 font-label-sm text-label-sm text-on-surface-variant underline active:opacity-70" id="login-btn" type="button">이미 계정이 있어요 · 로그인</button>
+</div>
+</form>
+</div>
+</main>
+
+<!-- 이미지 조정(크롭) 모달 -->
+<div id="crop-modal" class="crop-modal" hidden="">
+<div class="crop-modal-content">
+<h3 class="font-headline-lg text-headline-lg text-on-surface mb-1">프로필 이미지 조정</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-4">이미지를 드래그해서 위치를 옮기고, 슬라이더로 확대/축소하세요.</p>
+<div class="crop-stage" id="crop-stage">
+<img id="crop-image" class="crop-image" alt="크롭할 이미지" draggable="false">
+</div>
+<input type="range" id="crop-zoom" min="1" max="3" step="0.01" value="1">
+<div class="flex gap-3">
+<button type="button" class="flex-1 py-3 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm" id="crop-cancel-btn">취소</button>
+<button type="button" class="flex-1 py-3 rounded-full bg-primary text-on-primary font-label-sm text-label-sm" id="crop-confirm-btn">적용</button>
+</div>
+</div>
+</div>
+
+<script>
+    var nameInput = document.getElementById('name');
+    var emailInput = document.getElementById('email');
+    var passwordInput = document.getElementById('password');
+    var passwordConfirmInput = document.getElementById('password-confirm');
+    var phoneInput = document.getElementById('phone');
+    var addressInput = document.getElementById('address');
+    var profileImageInput = document.getElementById('profile-image');
+    var profilePreview = document.getElementById('profile-preview');
+
+    var nameError = document.getElementById('name-error');
+    var emailError = document.getElementById('email-error');
+    var passwordError = document.getElementById('password-error');
+    var passwordConfirmError = document.getElementById('password-confirm-error');
+    var phoneError = document.getElementById('phone-error');
+
+    var formMessage = document.getElementById('form-message');
+    var loading = document.getElementById('loading');
+    var signupBtn = document.getElementById('signup-btn');
+    var resetBtn = document.getElementById('reset-btn');
+    var loginBtn = document.getElementById('login-btn');
+
+    var cropModal = document.getElementById('crop-modal');
+    var cropStage = document.getElementById('crop-stage');
+    var cropImage = document.getElementById('crop-image');
+    var cropZoom = document.getElementById('crop-zoom');
+    var cropCancelBtn = document.getElementById('crop-cancel-btn');
+    var cropConfirmBtn = document.getElementById('crop-confirm-btn');
+
+    var selectedProfileDataUrl = null;
+
+    var STAGE_SIZE = 220;
+    var OUTPUT_SIZE = 300;
+
+    var cropState = { naturalWidth: 0, naturalHeight: 0, baseScale: 1, zoom: 1, offsetX: 0, offsetY: 0 };
+    var isDragging = false, dragStartX = 0, dragStartY = 0, dragStartOffsetX = 0, dragStartOffsetY = 0;
+
+    profileImageInput.addEventListener('change', function (event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            cropImage.onload = function () { openCropModal(); };
+            cropImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    function openCropModal() {
+        cropState.naturalWidth = cropImage.naturalWidth;
+        cropState.naturalHeight = cropImage.naturalHeight;
+        cropState.baseScale = Math.max(STAGE_SIZE / cropState.naturalWidth, STAGE_SIZE / cropState.naturalHeight);
+        cropState.zoom = 1;
+        var displayWidth = cropState.naturalWidth * getTotalScale();
+        var displayHeight = cropState.naturalHeight * getTotalScale();
+        cropState.offsetX = (STAGE_SIZE - displayWidth) / 2;
+        cropState.offsetY = (STAGE_SIZE - displayHeight) / 2;
+        cropZoom.value = '1';
+        applyCropTransform();
+        cropModal.hidden = false;
+    }
+
+    function getTotalScale() { return cropState.baseScale * cropState.zoom; }
+
+    function clampOffset() {
+        var totalScale = getTotalScale();
+        var displayWidth = cropState.naturalWidth * totalScale;
+        var displayHeight = cropState.naturalHeight * totalScale;
+        var minX = STAGE_SIZE - displayWidth;
+        var minY = STAGE_SIZE - displayHeight;
+        cropState.offsetX = Math.min(0, Math.max(minX, cropState.offsetX));
+        cropState.offsetY = Math.min(0, Math.max(minY, cropState.offsetY));
+    }
+
+    function applyCropTransform() {
+        clampOffset();
+        var totalScale = getTotalScale();
+        cropImage.style.width = (cropState.naturalWidth * totalScale) + 'px';
+        cropImage.style.height = (cropState.naturalHeight * totalScale) + 'px';
+        cropImage.style.left = cropState.offsetX + 'px';
+        cropImage.style.top = cropState.offsetY + 'px';
+    }
+
+    cropStage.addEventListener('pointerdown', function (event) {
+        isDragging = true;
+        cropStage.classList.add('dragging');
+        dragStartX = event.clientX;
+        dragStartY = event.clientY;
+        dragStartOffsetX = cropState.offsetX;
+        dragStartOffsetY = cropState.offsetY;
+        cropStage.setPointerCapture(event.pointerId);
+    });
+    cropStage.addEventListener('pointermove', function (event) {
+        if (!isDragging) return;
+        var deltaX = event.clientX - dragStartX;
+        var deltaY = event.clientY - dragStartY;
+        cropState.offsetX = dragStartOffsetX + deltaX;
+        cropState.offsetY = dragStartOffsetY + deltaY;
+        applyCropTransform();
+    });
+    function stopDragging() { isDragging = false; cropStage.classList.remove('dragging'); }
+    cropStage.addEventListener('pointerup', stopDragging);
+    cropStage.addEventListener('pointercancel', stopDragging);
+
+    cropZoom.addEventListener('input', function () {
+        cropState.zoom = Number(cropZoom.value);
+        applyCropTransform();
+    });
+
+    cropCancelBtn.addEventListener('click', function () {
+        cropModal.hidden = true;
+        profileImageInput.value = '';
+    });
+
+    cropConfirmBtn.addEventListener('click', function () {
+        var totalScale = getTotalScale();
+        var sourceX = (0 - cropState.offsetX) / totalScale;
+        var sourceY = (0 - cropState.offsetY) / totalScale;
+        var sourceSize = STAGE_SIZE / totalScale;
+
+        var canvas = document.createElement('canvas');
+        canvas.width = OUTPUT_SIZE;
+        canvas.height = OUTPUT_SIZE;
+        var ctx = canvas.getContext('2d');
+        ctx.beginPath();
+        ctx.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(cropImage, sourceX, sourceY, sourceSize, sourceSize, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
+        selectedProfileDataUrl = canvas.toDataURL('image/png');
+        profilePreview.src = selectedProfileDataUrl;
+        cropModal.hidden = true;
+        profileImageInput.value = '';
+    });
+
+    document.querySelectorAll('.toggle-password').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var targetId = btn.getAttribute('data-target');
+            var targetInput = document.getElementById(targetId);
+            if (targetInput.type === 'password') {
+                targetInput.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                targetInput.type = 'password';
+                btn.textContent = '👁';
+            }
+        });
+    });
+
+    resetBtn.addEventListener('click', function () {
+        setTimeout(function () {
+            profilePreview.src = 'https://placehold.co/120x120?text=Profile';
+            selectedProfileDataUrl = null;
+            clearAllErrors();
+            formMessage.textContent = '';
+        }, 0);
+    });
+
+    loginBtn.addEventListener('click', function () {
+        window.location.href = '../2-2. 로그인/code.html';
+    });
+
+    var EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var PHONE_REGEX = /^01[0-9]-?\d{3,4}-?\d{4}$/;
+
+    function clearAllErrors() {
+        [nameError, emailError, passwordError, passwordConfirmError, phoneError].forEach(function (el) { el.textContent = ''; });
+    }
+
+    function validateForm() {
+        clearAllErrors();
+        var isValid = true;
+
+        if (!nameInput.value.trim()) { nameError.textContent = '이름을 입력해주세요.'; isValid = false; }
+
+        var email = emailInput.value.trim();
+        if (!email) { emailError.textContent = '이메일을 입력해주세요.'; isValid = false; }
+        else if (!EMAIL_REGEX.test(email)) { emailError.textContent = '이메일 형식이 올바르지 않습니다.'; isValid = false; }
+
+        var password = passwordInput.value;
+        if (!password) { passwordError.textContent = '비밀번호를 입력해주세요.'; isValid = false; }
+        else if (password.length < 8) { passwordError.textContent = '비밀번호는 8자 이상이어야 합니다.'; isValid = false; }
+
+        var passwordConfirm = passwordConfirmInput.value;
+        if (!passwordConfirm) { passwordConfirmError.textContent = '비밀번호 확인을 입력해주세요.'; isValid = false; }
+        else if (password !== passwordConfirm) { passwordConfirmError.textContent = '비밀번호가 일치하지 않습니다.'; isValid = false; }
+
+        var phone = phoneInput.value.trim();
+        if (phone && !PHONE_REGEX.test(phone)) { phoneError.textContent = '전화번호 형식이 올바르지 않습니다. (예: 010-1234-5678)'; isValid = false; }
+
+        return isValid;
+    }
+
+    function setLoading(isLoading) {
+        loading.classList.toggle('hidden', !isLoading);
+        loading.classList.toggle('flex', isLoading);
+        signupBtn.disabled = isLoading;
+        resetBtn.disabled = isLoading;
+    }
+
+    document.getElementById('signup-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        formMessage.textContent = '';
+        formMessage.className = 'text-center font-label-sm text-label-sm min-h-[18px]';
+
+        if (!validateForm()) return;
+
+        setLoading(true);
+
+        // TODO: 여기서 실제 Supabase 연동 시 supabase.auth.signUp() + member insert로 교체
+        try {
+            localStorage.setItem('onboarding_signup', JSON.stringify({
+                name: nameInput.value.trim(),
+                email: emailInput.value.trim(),
+                phone: phoneInput.value.trim() || null,
+                address: addressInput.value.trim() || null,
+                profilePhoto: selectedProfileDataUrl
+            }));
+            localStorage.setItem('onboarding_nickname', nameInput.value.trim());
+            if (selectedProfileDataUrl) localStorage.setItem('onboarding_profile_photo', selectedProfileDataUrl);
+            localStorage.setItem('uc_logged_in', 'true');
+            localStorage.setItem('uc_auth_email', emailInput.value.trim());
+        } catch (err) {}
+
+        setTimeout(function () {
+            setLoading(false);
+            formMessage.textContent = '회원가입이 완료되었어요! 다음 단계로 이동합니다.';
+            formMessage.className = 'text-center font-label-sm text-label-sm min-h-[18px] text-primary';
+            setTimeout(function () {
+                window.location.href = '../1-2. 온보딩-시작하기/code.html';
+            }, 800);
+        }, 500);
+    });
+</script>
+</body></html>
