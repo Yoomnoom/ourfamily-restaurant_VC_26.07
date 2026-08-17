@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>우리집식당 - 게스트 응답</title>
+<link rel="stylesheet" href="../shared.css" />
+</head>
+<body>
+<main class="guest-page">
+  <div class="guest-brand">♜ 우리집식당</div>
+  <section class="guest-intro">
+    <p>8월 18일 화요일 · 19:00</p>
+    <h1>김치찌개, 함께 먹을까요?</h1>
+    <p>회원가입 없이 30초면 답할 수 있어요.</p>
+  </section>
+  <form class="card response-form">
+    <label>이름<input placeholder="이름을 입력해주세요" /></label>
+    <fieldset>
+      <legend>참여 여부</legend>
+      <label class="choice"><input type="radio" name="status" checked /><span>먹어요</span></label>
+      <label class="choice"><input type="radio" name="status" /><span>안 먹어요</span></label>
+    </fieldset>
+    <label>도착 시간 <small>(먹는 경우)</small><input type="time" value="19:00" /></label>
+    <button class="submit" type="button">응답 보내기</button>
+  </form>
+</main>
+</body>
+</html>

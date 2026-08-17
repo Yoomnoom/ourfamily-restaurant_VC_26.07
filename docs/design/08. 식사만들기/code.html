@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>우리집식당 - 식사 만들기</title>
+<link rel="stylesheet" href="../shared.css" />
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <button class="brand" aria-label="홈으로"><span>♜</span>우리집식당</button>
+    <button class="household">우리집⌄</button>
+    <div class="top-actions">
+      <button class="icon-button" aria-label="알림 열기"><span class="icon" aria-hidden="true">♢</span></button>
+      <button class="icon-button" aria-label="전체 메뉴 열기"><span class="icon" aria-hidden="true">☰</span></button>
+    </div>
+  </header>
+  <main class="content">
+    <form class="meal-form">
+      <div class="form-head"><h1>새 식사 만들기</h1><button type="button" class="icon-button" aria-label="닫기"><span class="icon" aria-hidden="true">×</span></button></div>
+      <div class="progress"><i></i></div>
+      <fieldset class="card">
+        <legend>식사 종류</legend>
+        <div class="segments">
+          <button type="button" class="active">집밥</button>
+          <button type="button">외식</button>
+          <button type="button">배달</button>
+        </div>
+      </fieldset>
+      <label>날짜<input type="date" value="2026-08-18" /></label>
+      <label>시간<input type="time" value="19:00" /></label>
+      <label>메뉴<input placeholder="무엇을 먹나요?" value="김치찌개" /></label>
+      <label>메모<textarea placeholder="가족에게 전할 내용 (선택)"></textarea></label>
+      <fieldset class="card participants">
+        <legend>참여자</legend>
+        <span>김영희 ✓</span><span>박철수 ✓</span><span>이지은 ✓</span><span>김하준 ✓</span>
+      </fieldset>
+      <button class="submit" type="button">식사 만들고 링크 보기</button>
+    </form>
+  </main>
+</div>
+</body>
+</html>

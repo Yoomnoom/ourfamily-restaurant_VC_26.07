@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>우리집식당 - 로그인</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared.css" />
+<style>:root{--font-serif:'Noto Serif KR',serif;--font-sans:'Plus Jakarta Sans',Pretendard,sans-serif}</style>
+</head>
+<body>
+<main class="guest-page warm-table">
+  <div class="guest-brand wt-serif">우리집식당</div>
+  <section class="guest-intro">
+    <h1 class="wt-serif">묻지 않아도 아는 집</h1>
+    <p>이메일로 로그인 링크를 받아 시작해요.</p>
+  </section>
+  <form class="card response-form">
+    <label>이메일<input type="email" placeholder="example@email.com" /></label>
+    <button class="submit" type="button">로그인 링크 받기</button>
+  </form>
+  <div style="display:flex;align-items:center;gap:10px;margin:14px 4px">
+    <div style="flex:1;height:1px;background:var(--border)"></div>
+    <span class="muted" style="font-size:13px">또는</span>
+    <div style="flex:1;height:1px;background:var(--border)"></div>
+  </div>
+  <button class="secondary" style="width:100%" type="button">지문/패스키로 로그인</button>
+</main>
+</body>
+</html>
