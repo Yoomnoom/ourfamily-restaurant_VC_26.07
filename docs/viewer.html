@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>우리집식당 - 화면 뷰어</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; background: #f0eded; color: #1b1c1c; display: flex; height: 100vh; overflow: hidden; }
+
+  .sidebar { width: 240px; flex-shrink: 0; background: #fff; border-right: 1px solid #e4e2e2; padding: 16px 12px; overflow-y: auto; }
+  .sidebar h1 { font-size: 15px; margin: 4px 4px 12px; }
+  .base-url { width: 100%; font-size: 12px; padding: 8px; border-radius: 8px; border: 1px solid #c6c6ca; margin-bottom: 14px; }
+  .step-btn { text-align: left; width: 100%; padding: 10px 12px; border-radius: 10px; border: none; background: transparent; cursor: pointer; font-size: 14px; color: #1b1c1c; margin-bottom: 4px; display: block; }
+  .step-btn:hover { background: #f0eded; }
+  .step-btn.active { background: #5d5e62; color: #fff; font-weight: 600; }
+  .step-btn .path { display: block; font-size: 11px; opacity: .65; margin-top: 2px; }
+
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .topbar { height: 56px; flex-shrink: 0; background: #fff; border-bottom: 1px solid #e4e2e2; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; gap: 16px; }
+  .topbar .title { font-size: 14px; color: #45474a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .device-group { display: flex; gap: 4px; background: #f0eded; border-radius: 999px; padding: 3px; }
+  .device-btn { padding: 7px 12px; border-radius: 999px; border: none; background: transparent; cursor: pointer; font-size: 12px; color: #45474a; }
+  .device-btn.active { background: #1b1c1c; color: #fff; }
+  .reload-btn { padding: 7px 14px; border-radius: 999px; border: 1px solid #c6c6ca; background: #fff; cursor: pointer; font-size: 12px; }
+
+  .frame-wrap { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 24px; }
+  .device-frame { border-radius: 28px; border: 10px solid #1b1c1c; box-shadow: 0 12px 32px rgba(0,0,0,.18); overflow: hidden; background: #fff; transition: width .15s, height .15s; }
+  .device-frame.desktop { border-radius: 10px; border-width: 4px; }
+  .device-frame iframe { width: 100%; height: 100%; border: none; display: block; }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <h1>우리집식당 화면</h1>
+  <input id="baseUrl" class="base-url" value="https://ourfamily-restaurant-vc-26-07.vercel.app" title="localhost:3000으로 바꾸면 로컬 dev 서버를 봅니다" />
+  <div id="steps"></div>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <span class="title" id="titleLabel"></span>
+    <div style="display:flex; gap:8px;">
+      <div class="device-group" id="deviceGroup"></div>
+      <button class="reload-btn" onclick="reload()">새로고침</button>
+    </div>
+  </div>
+  <div class="frame-wrap">
+    <div class="device-frame" id="frame">
+      <iframe id="screen"></iframe>
+    </div>
+  </div>
+</main>
+<script>
+  var ROUTES = [
+    ["/login", "로그인 (매직링크 + 패스키)"],
+    ["/", "홈 (로그인 필요)"],
+    ["/tables", "내 식탁"],
+    ["/calendar", "달력"],
+    ["/records", "기록"],
+    ["/meals/new", "식사 만들기"],
+    ["/respond/demo", "게스트 응답 (없는 토큰)"]
+  ];
+  var DEVICES = [
+    ["mobile", "모바일", 390, 844],
+    ["tablet", "태블릿", 768, 1024],
+    ["desktop", "데스크톱", 1280, 800]
+  ];
+  var currentPath = ROUTES[0][0];
+  var currentDevice = DEVICES[0];
+
+  function render() {
+    var stepsEl = document.getElementById("steps");
+    stepsEl.innerHTML = "";
+    ROUTES.forEach(function (r) {
+      var btn = document.createElement("button");
+      btn.className = "step-btn" + (r[0] === currentPath ? " active" : "");
+      btn.innerHTML = r[1] + '<span class="path">' + r[0] + "</span>";
+      btn.onclick = function () { currentPath = r[0]; load(); render(); };
+      stepsEl.appendChild(btn);
+    });
+
+    var deviceGroup = document.getElementById("deviceGroup");
+    deviceGroup.innerHTML = "";
+    DEVICES.forEach(function (d) {
+      var btn = document.createElement("button");
+      btn.className = "device-btn" + (d[0] === currentDevice[0] ? " active" : "");
+      btn.textContent = d[1];
+      btn.onclick = function () { currentDevice = d; applySize(); render(); };
+      deviceGroup.appendChild(btn);
+    });
+
+    document.getElementById("titleLabel").textContent = currentPath + " · " + currentDevice[1] + " (" + currentDevice[2] + "×" + currentDevice[3] + ")";
+  }
+
+  function applySize() {
+    var frame = document.getElementById("frame");
+    frame.style.width = currentDevice[2] + "px";
+    frame.style.height = currentDevice[3] + "px";
+    frame.classList.toggle("desktop", currentDevice[0] === "desktop");
+  }
+
+  function load() {
+    var base = document.getElementById("baseUrl").value.replace(/\/$/, "");
+    document.getElementById("screen").src = base + currentPath;
+  }
+
+  function reload() { load(); }
+
+  document.getElementById("baseUrl").addEventListener("change", load);
+  applySize();
+  render();
+  load();
+</script>
+</body>
+</html>
